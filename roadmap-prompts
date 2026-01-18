@@ -1,0 +1,67 @@
+# Smart Home HQ — Prompt Library
+
+Use these prompts inside the ChatGPT Project “Smart Home HQ (HomeKit-first)”.
+Rule: repo files are the source of truth; chats generate updates that get saved back here.
+
+---
+
+## Phase 0 — Inventory & Target Architecture
+Phase 0: Build the master inventory and target architecture.
+Inputs: 00-Inventory/device-inventory.csv, screenshots of Home Assistant → Devices & Services, list of hubs/bridges, and my top daily routines.
+Output: finalized inventory, device ownership map (HA vs Scrypted vs Homebridge vs direct HomeKit), HomeKit exposure list, and phased migration roadmap with rollback notes.
+
+---
+
+## Phase 1 — Network Segmentation & Privacy
+Phase 1: Design my smart home network segmentation.
+Inputs: 01-Network/current-network.md, router model, SSIDs, DHCP/IP ranges, and VLAN/firewall capabilities.
+Output: target topology for Trusted / IoT / Cameras, firewall rule matrix, mDNS strategy, step-by-step cutover plan with validation checks + rollback.
+
+---
+
+## Phase 2 — Home Assistant VM Reliability (UTM)
+Phase 2: Validate and optimize my Home Assistant VM running on Mac mini via UTM.
+Inputs: 02-HomeAssistant/ha-baseline.md, VM CPU/RAM/disk, VM network mode (bridged/NAT), HA version.
+Output: optimized VM settings, discovery/mDNS checklist, backup & snapshot plan, performance validation tests.
+
+---
+
+## Phase 3 — Integration Ownership Cleanup
+Phase 3: Clean my integration strategy.
+Inputs: 02-HomeAssistant/integrations.md, what’s currently exposed to HomeKit, and Scrypted/Homebridge plugin lists.
+Output: which platform owns each device, what to migrate, what to keep, and a clean HomeKit exposure list with duplication prevention.
+
+---
+
+## Phase 4 — Areas, Zones, Labels & Naming
+Phase 4: Design my Areas, Zones, Labels, and naming convention.
+Inputs: 00-Inventory/room-map.md (or equivalent), preferred room names, existing entity names.
+Output: finalized taxonomy, naming rules, labels, and a safe rename plan that won’t break automations.
+
+---
+
+## Phase 5 — Dashboard v1
+Phase 5: Build my Home Assistant dashboard specification.
+Inputs: 05-Dashboards/dashboard-spec.md + screenshots of dashboards I like + required controls.
+Output: final dashboard blueprint, recommended cards/layout, YAML or UI build steps.
+
+---
+
+## Phase 6 — Automation Library
+Phase 6: Implement my automation library.
+Inputs: schedules (wake/sleep), presence behavior, alarm preferences, notification style.
+Output: automation list, HA YAML/scripts, HomeKit-friendly scenes, testing/validation steps.
+
+---
+
+## Phase 7 — Hardening & Monitoring
+Phase 7: Harden my smart home stack.
+Inputs: remote access method, user accounts, camera privacy preferences, update policies.
+Output: HA hardening checklist, network hardening steps, camera isolation policy, monthly maintenance playbook.
+
+---
+
+## Phase X — Add New Device
+Phase X: Add new device(s).
+Inputs: updated device-inventory.csv + device details.
+Output: ownership assignment, integration steps, naming/labels, HomeKit exposure decision, dashboard placement.
