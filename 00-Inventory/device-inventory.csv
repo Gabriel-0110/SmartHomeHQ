@@ -1,2 +1,18 @@
-Device Name,Category,Manufacturer,Model,Location,Purchase Date,Purchase Price,Status,IP Address,MAC Address,Notes,Warranty Expiry
-Home Assistant Server,Hub,Apple,Mac mini,Office Rack,,,Active,,,UTM VM,
+area,device_name,brand,model,protocol,hub_or_owner,ip_or_id,expose_to_homekit,notes
+Infrastructure,Home Assistant,Home Assistant,UTM VM,LAN,Mac mini M4 UTM,,no,Primary hub/brain
+Infrastructure,Scrypted,Scrypted,,LAN,Scrypted Host,,no,Camera hub + HKSV
+Infrastructure,Homebridge,Homebridge,,LAN,Homebridge Host,,no,Only for niche devices
+Bedroom,Bedroom Vanity Light,Philips Hue,,Zigbee,Hue Bridge,,yes,Use Adaptive Lighting in HomeKit
+Bedroom,Bedroom TV Plug,Kasa,,WiFi,Home Assistant,,yes,TV power control
+Bedroom,Bedroom Air Purifier Plug,Kasa,,WiFi,Home Assistant,,yes,Schedules + presence
+Bedroom,Bedroom TV Light Strip,Govee,,WiFi,Home Assistant,,yes,Sync with TV modes
+Bedroom,Safe Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,no,Security trigger when Away
+Office,Office Floor Lamp,Philips Hue,,Zigbee,Hue Bridge,,yes,
+Office,Govee Hex Panels,Govee,,WiFi,Home Assistant,,yes,
+Kitchen,Kitchen Camera,Tapo,C110,WiFi,Scrypted,192.168.1.205,yes,RTSP stream1/2 via Scrypted
+Hallway,Hallway Camera,Tapo,C110,WiFi,Scrypted,,yes,
+Entrance,Entrance Camera,Tapo,C110,WiFi,Scrypted,,yes,
+Entrance,Door Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,yes,Perimeter alert + Home/Away modes
+Hallway,Wireless Switch,Aqara,Wireless Switch,Zigbee,Aqara Hub M2,,yes,Scene control
+Bathroom,Bathroom Lights,Philips Hue,,Zigbee,Hue Bridge,,yes,
+Bathroom,Bathroom Motion Sensor,Aqara,Motion Sensor,Zigbee,Aqara Hub M2,,no,Drives HA automation
