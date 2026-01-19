@@ -55,7 +55,9 @@
 |--------|-------------|-----------------|-------|
 | Bedroom Vanity Light | Hue Bridge → HomeKit | Native | Adaptive Lighting in HomeKit |
 | Office Floor Lamp | Hue Bridge → HomeKit | Native | - |
-| Bathroom Lights | Hue Bridge → HomeKit | Native | - |
+| Bathroom Mirror 1 | Hue Bridge → HomeKit | Native | - |
+| Bathroom Mirror 2 | Hue Bridge → HomeKit | Native | - |
+| Bathroom Mirror 3 | Hue Bridge → HomeKit | Native | - |
 
 **Current Issue**: Listed as exposed via HA in inventory. Should verify if double-exposed.
 
@@ -83,9 +85,13 @@
 | Device | Current Owner | Current HK Exposure | Recommendation |
 |--------|---------------|---------------------|----------------|
 | Bedroom Safe Sensor | Aqara Hub M2 | No | HA automation only (security trigger) |
-| Entrance Door Sensor | Aqara Hub M2 | Yes | Direct via Aqara Hub HomeKit or HA bridge |
-| Bathroom Motion Sensor | Aqara Hub M2 | No | HA automation only (lighting driver) |
-| Hallway Wireless Switch | Aqara Hub M2 | Yes | Direct via Aqara Hub HomeKit (scene control) |
+| Bedroom Window Left Contact | Aqara Hub M2 | Yes | Via HA bridge (perimeter + automation) |
+| Bedroom Window Right Contact | Aqara Hub M2 | Yes | Via HA bridge (perimeter + automation) |
+| Entrance Door Sensor | Aqara Hub M2 | Yes | Via HA bridge (perimeter + automation) |
+| Kitchen Fridge Contact | Aqara Hub M2 | Yes | Via HA bridge (monitoring) |
+| Bathroom Motion Sensor (P1) | Aqara Hub M2 | No | HA automation only (lighting driver) |
+| Bedroom Motion Sensor (P2) | Aqara Hub M2 | No | HA automation only (presence detection) |
+| Hallway Wireless Switch | Aqara Hub M2 | Yes | Via HA bridge (scene control) |
 
 **Decision Needed**:
 - **Option A**: Aqara Hub M2 has native HomeKit. Expose sensors directly from Aqara, use HA for automation only.
@@ -125,10 +131,10 @@
 
 | Platform | Device Count | Device Types | HomeKit Exposure |
 |----------|-------------|--------------|------------------|
-| **Home Assistant** | 10 | Kasa plugs, Govee lights, Aqara sensors | HA HomeKit Bridge |
+| **Home Assistant** | 10 | Kasa plugs (2), Govee lights (2), Aqara sensors (5), Switch (1) | HA HomeKit Bridge |
 | **Scrypted** | 4 | Tapo cameras | Native HKSV |
-| **Hue Bridge** | 4 | Hue lights | Native HomeKit |
-| **Aqara Hub M2** | 4 | Zigbee sensors/switches | Via HA (recommended) |
+| **Hue Bridge** | 5 | Hue lights (Bedroom, Office, Bathroom x3) | Native HomeKit |
+| **Aqara Hub M2** | 11 | Contact sensors (6), Motion sensors (2), Switch (1), NFC tags (3) | Via HA for exposed devices |
 | **Homebridge** | 0 | Niche only | (future use) |
 
 ---

@@ -23,18 +23,18 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 
 ## HomeKit Exposure List
 
-### ✅ Expose to HomeKit (13 devices)
+### ✅ Expose to HomeKit (20 devices)
 
-#### **Lights (6 devices)**
+#### **Lights (7 devices)**
 | Device | Exposure Method | Rationale |
 |--------|----------------|-----------|
 | Bedroom Vanity Light | Hue Bridge (native) | User control + Adaptive Lighting |
 | Office Floor Lamp | Hue Bridge (native) | User control |
-| Bathroom Lights | Hue Bridge (native) | User control |
+| Bathroom Mirror 1 | Hue Bridge (native) | User control |
+| Bathroom Mirror 2 | Hue Bridge (native) | User control |
+| Bathroom Mirror 3 | Hue Bridge (native) | User control |
 | Bedroom TV Light Strip | HA HomeKit Bridge | TV mode sync automation + user control |
 | Office Hex Panels | HA HomeKit Bridge | User control |
-
-**4th Hue light**: Need to identify from HA (possibly another room?)
 
 #### **Plugs/Switches (3 devices)**
 | Device | Exposure Method | Rationale |
@@ -51,27 +51,52 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 | Entrance Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
 | Office Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
 
-#### **Sensors (1 device)** - Decision needed
+#### **Sensors (5 devices)**
 | Device | Exposure Method | Rationale |
 |--------|----------------|-----------|
-| Entrance Door Contact Sensor | HA HomeKit Bridge OR Aqara native | Perimeter alert + Home/Away mode trigger |
+| Bedroom Window Left Contact | HA HomeKit Bridge | Perimeter security + ventilation automation |
+| Bedroom Window Right Contact | HA HomeKit Bridge | Perimeter security + ventilation automation |
+| Entrance Door Contact Sensor | HA HomeKit Bridge | Perimeter alert + Home/Away mode trigger |
+| Kitchen Fridge Contact | HA HomeKit Bridge | Door left open monitoring |
+| Hallway Wireless Switch | HA HomeKit Bridge | Scene control |
 
 ---
 
-### ❌ Do NOT Expose to HomeKit (5 devices)
+### ❌ Do NOT Expose to HomeKit (15 devices)
 
-#### **Automation-Only Sensors**
+#### **Automation-Only Sensors (5 devices)**
 | Device | Kept In | Rationale |
 |--------|---------|-----------|
 | Bedroom Safe Contact Sensor | HA + Aqara Hub | Security automation trigger (not user-controlled) |
-| Bathroom Motion Sensor | HA + Aqara Hub | Lighting automation trigger (not user-controlled) |
+| Bathroom Motion Sensor (P1) | HA + Aqara Hub | Lighting automation trigger (not user-controlled) |
+| Bedroom Motion Sensor (P2) | HA + Aqara Hub | Presence detection automation |
+| NFC Tag 1 (Bedroom) | HA | Automation trigger |
+| NFC Tag 2 (Office) | HA | Automation trigger |
 
-#### **Infrastructure**
+#### **Voice Assistants (2 devices)**
+| Device | Kept In | Rationale |
+|--------|---------|-----------|
+| Echo Show 8 (Bedroom) | Direct | Alarm clock + voice assistant |
+| Echo Dot (Office) | Direct | Voice assistant |
+
+#### **Media Devices (3 devices)**
+| Device | Kept In | Rationale |
+|--------|---------|-----------|
+| Apple TV (Bedroom) | Direct | Media player + HomeKit hub |
+| Apple TV (Control Room) | Direct | Primary HomeKit/Thread/Matter hub |
+| iPad 5th Gen Panel | Direct | Wall-mounted dashboard |
+
+#### **Infrastructure (3 devices)**
 | Device | Kept In | Rationale |
 |--------|---------|-----------|
 | Home Assistant | - | Backend hub |
 | Scrypted | - | Backend camera processor |
 | Homebridge | - | Backend bridge (if used) |
+
+#### **NFC Bundle**
+| Device | Count | Rationale |
+|--------|-------|-----------|
+| NFC Tags (unassigned) | 30-32 | Available for future automation triggers |
 
 ---
 
@@ -116,7 +141,10 @@ homekit:
         - switch.bedroom_air_purifier_plug
         - light.bedroom_tv_light_strip
         - light.office_hex_panels
+        - binary_sensor.bedroom_window_left_contact
+        - binary_sensor.bedroom_window_right_contact
         - binary_sensor.entrance_door_contact
+        - binary_sensor.kitchen_fridge_contact
         - sensor.hallway_wireless_switch
 ```
 
@@ -159,22 +187,26 @@ SmartHomeHQ (Home)
 │   ├── Vanity Light (Hue)
 │   ├── TV Plug (Kasa via HA)
 │   ├── Air Purifier Plug (Kasa via HA)
-│   └── TV Light Strip (Govee via HA)
+│   ├── TV Light Strip (Govee via HA)
+│   ├── Window Left Contact (Aqara via HA)
+│   └── Window Right Contact (Aqara via HA)
 ├── Office
 │   ├── Floor Lamp (Hue)
 │   ├── Hex Panels (Govee via HA)
 │   └── Camera (Scrypted HKSV)
 ├── Kitchen
-│   ├── Bathroom Lights (Hue)
-│   └── Camera (Scrypted HKSV)
+│   ├── Camera (Scrypted HKSV)
+│   └── Fridge Contact (Aqara via HA)
 ├── Hallway
 │   ├── Camera (Scrypted HKSV)
 │   └── Wireless Switch (Aqara via HA)
 ├── Entrance
 │   ├── Camera (Scrypted HKSV)
-│   └── Door Contact Sensor (via HA) - OPTIONAL
+│   └── Door Contact Sensor (Aqara via HA)
 └── Bathroom
-    └── Lights (Hue)
+    ├── Mirror 1 (Hue)
+    ├── Mirror 2 (Hue)
+    └── Mirror 3 (Hue)
 ```
 
 **Note**: HomeKit room names should match HA areas for consistency.

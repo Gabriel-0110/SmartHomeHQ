@@ -9,9 +9,9 @@ This roadmap outlines the phased migration and improvement plan for the SmartHom
 ## Current Status
 
 ### ✅ Phase 0: Inventory & Target Architecture (COMPLETED)
-- [x] Master device inventory created (19 devices across 6 areas)
+- [x] Master device inventory created (35 devices across 6 areas)
 - [x] Device ownership map defined (HA vs Scrypted vs Homebridge vs HomeKit)
-- [x] HomeKit exposure strategy documented (13 devices exposed)
+- [x] HomeKit exposure strategy documented (20 devices exposed)
 - [x] Screenshots captured from Home Assistant integrations
 - [x] Baseline files established
 
@@ -113,6 +113,9 @@ Merge multiple HA HomeKit Bridge instances into single, filtered bridge.
 ### Goal
 Standardize device naming and organization across HA and HomeKit.
 
+### Status
+**PROCEED** - User decision: Building from scratch, breaking automations is acceptable for long-term organization.
+
 ### Tasks
 - [ ] Create [areas-zones-labels.md](00-Inventory/areas-zones-labels.md)
 - [ ] Define naming convention (consistent with CLAUDE.md guidelines)
@@ -130,12 +133,12 @@ Standardize device naming and organization across HA and HomeKit.
 ### Risk Level
 **High** - Entity ID changes break automations
 
+**Risk Acceptance**: User acknowledges risk, prioritizes organization over short-term convenience.
+
 ### Rollback Strategy
 - Restore entity IDs via HA entity registry
 - Restore configuration.yaml from backup
 - Time: 1 hour (manual verification needed)
-
-**Recommendation**: Consider skipping if current naming is acceptable.
 
 ---
 
@@ -289,7 +292,7 @@ Implement ongoing monitoring and security best practices.
 - HomeKit exposure decisions documented
 
 ### Overall Project
-- HomeKit shows only stable, user-friendly devices (13 devices)
+- HomeKit shows only stable, user-friendly devices (20 devices)
 - HA owns all automation logic
 - Cameras isolated in Scrypted with HKSV
 - Network segmented (Trusted/IoT/Cameras)

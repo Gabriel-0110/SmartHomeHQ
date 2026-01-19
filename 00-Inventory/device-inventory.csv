@@ -33,3 +33,6 @@ Bathroom,Baño Mirror 1,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Bathroom,Baño Mirror 2,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Bathroom,Baño Mirror 3,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Bathroom,Motion & Illumination Sensor (P1),Aqara,Motion & Light Sensor,Zigbee,Aqara Hub M2,,no,Drives HA automation
+Bathroom,Nest Mini (1st Gen),Google,Smart Speaker,WiFi,Direct,,no,Voice assistant + speaker
+Kitchen,Microwave Oven,Toshiba,ML-SEM23P(BS),WiFi,Home Assistant,,yes,Smart microwave control
+Office,Printer,HP,Deskjet 3630,WiFi,Home Assistant,,no,Wireless printing

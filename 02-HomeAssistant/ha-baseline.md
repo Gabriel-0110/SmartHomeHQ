@@ -18,16 +18,16 @@
 - Scrypted is the camera hub (HKSV)
 
 ## Integrations (Current)
-List what is currently added in HA:
-- Hue: TBD
-- Aqara: TBD
-- Tapo: TBD
-- Kasa: TBD
-- Govee: TBD
-- HomeKit Bridge: TBD
-- HomeKit Controller: TBD
-- Matter: TBD
-- Thread: TBD
+Based on device inventory, the following integrations are required:
+- Hue: REQUIRED (7 Hue lights via Hue Bridge)
+- Aqara: REQUIRED (11 Aqara devices via Hub M2)
+- Tapo: REQUIRED (4 Tapo C110 cameras - may be via Scrypted instead)
+- Kasa: REQUIRED (2 Kasa WiFi plugs)
+- Govee: REQUIRED (2 Govee lights/strips)
+- HomeKit Bridge: REQUIRED (exposes 10 WiFi/sensor devices to HomeKit)
+- HomeKit Controller: Optional (if using native Hue/Aqara HomeKit)
+- Matter: Status TBD
+- Thread: Status TBD (Apple TV hubs support Thread)
 
 ## Add-ons / Services (Current)
 - File editor / VS Code Server: TBD

@@ -9,14 +9,14 @@
 
 | Category | Count |
 |----------|-------|
-| **Total Devices** | 34 (excluding infrastructure) |
+| **Total Devices** | 35 (excluding infrastructure) |
 | **Infrastructure** | 3 (HA, Scrypted, Homebridge) |
 | **Hubs/Controllers** | 4 (Apple TV, Aqara M2, Hue Bridge, NFC Bundle) |
-| **HomeKit Exposed** | 20 devices (59%) |
+| **HomeKit Exposed** | 20 devices (57%) |
 | **Cameras** | 4 (Tapo C110) |
 | **Lights** | 9 (Hue x7, Govee x2) |
-| **Sensors** | 11 (contact x6, motion x2, NFC x3) |
-| **Plugs/Switches** | 3 (Kasa x2, Aqara wireless x1) |
+| **Sensors** | 12 (contact x6, motion x2, NFC x4) |
+| **Plugs/Switches** | 4 (Kasa x2, Govee strip x1, Aqara wireless x1) |
 | **Voice Assistants** | 2 (Echo Show 8, Echo Dot) |
 | **Media Devices** | 3 (Apple TV x2, iPad dashboard) |
 
@@ -102,8 +102,8 @@
 | Protocol | Count | Devices |
 |----------|-------|---------|
 | **Zigbee** | 18 | Hue lights (7) + Aqara sensors/switches (11) |
-| **WiFi** | 13 | Cameras (4), Govee (2), Kasa (2), Echo (2), Apple TV (2), iPad (1) |
-| **NFC** | 3+ | NFC Tags (2 assigned + 30-35 in bundle) |
+| **WiFi** | 14 | Cameras (4), Govee (2), Kasa (2), Echo (2), Apple TV (2), iPad (1) |
+| **NFC** | 3+ | NFC Tags (3 assigned + 30-35 in bundle) |
 | **LAN** | 3 | HA, Scrypted, Homebridge (infrastructure) |
 
 ---
@@ -112,13 +112,12 @@
 
 ### ✅ Expose to HomeKit (20 devices)
 
-#### Lights (9 devices)
+#### Lights (7 devices)
 - Bedroom Vanity Light
 - Office Floor Lamp
 - Bathroom Mirror 1, 2, 3
 - Bedroom TV Light Strip
 - Office Hex Panels
-- 2 additional Hue lights (TBD location)
 
 #### Cameras (4 devices)
 - Kitchen Camera (HKSV)
@@ -137,13 +136,13 @@
 - Bedroom Air Purifier Plug
 - Hallway Wireless Switch
 
-### ❌ Do NOT Expose to HomeKit (14+ devices)
+### ❌ Do NOT Expose to HomeKit (15 devices)
 
 #### Automation-Only Sensors
 - Bedroom Safe Contact (security trigger only)
 - Bedroom Motion & Illumination (P2) (presence automation)
 - Bathroom Motion & Illumination (P1) (lighting automation)
-- NFC Tags x3+ (automation triggers via HA)
+- NFC Tags x3 (automation triggers via HA)
 
 #### Voice Assistants
 - Echo Show 8 (Bedroom)
@@ -202,13 +201,14 @@
 
 ## Network Implications (For Phase 1)
 
-### WiFi Device Count: 13
+### WiFi Device Count: 14
 - 4x Cameras (Tapo C110) → **Camera VLAN**
 - 2x Echo devices → **IoT VLAN**
 - 2x Govee lights → **IoT VLAN**
 - 2x Kasa plugs → **IoT VLAN**
 - 2x Apple TV → **Trusted VLAN** (HomeKit hubs)
 - 1x iPad → **Trusted VLAN** (dashboard)
+- 1x Govee TV light strip → **IoT VLAN**
 
 ### Zigbee Device Count: 18
 - Zigbee devices don't need VLAN segregation (isolated via hubs)
@@ -218,12 +218,7 @@
 
 ## Missing Information / Next Steps
 
-### 1. Hue Light Locations
-- Inventory shows 7 Hue lights total
-- Current: Bedroom Vanity (1), Office Floor Lamp (1), Bathroom Mirrors (3) = 5
-- **Missing 2 Hue lights** - Need to identify location/purpose
-
-### 2. IP Addresses
+### 1. IP Addresses
 - Only Kitchen Camera has documented IP (192.168.1.205)
 - Need IPs for:
   - HA VM
@@ -232,24 +227,19 @@
   - Other 3 cameras
   - WiFi devices (for static assignment in Phase 1)
 
-### 3. Aqara Hub M2 Count
-- Inventory mentions "Aqara Hub M2" (singular)
-- Original Phase 0 docs mentioned "2x Hub M2 instances"
-- **Clarify**: Do you have 1 or 2 Aqara M2 hubs?
-
-### 4. Control Room Physical Setup
+### 2. Control Room Physical Setup
 - Is "Control Room" a dedicated equipment room/closet?
 - Or is it collocated with another area (Office, Bedroom)?
 - Helps with network planning (cable runs, WiFi coverage)
 
-### 5. Router/Network Details
+### 3. Router/Network Details
 - Still need from Phase 1: Verizon router model, VLAN support, current SSID setup
 
 ---
 
 ## Files Generated
 
-- [device-inventory.csv](device-inventory.csv) - Complete device list (34 devices)
+- [device-inventory.csv](device-inventory.csv) - Complete device list (35 devices)
 - [ownership-map.md](ownership-map.md) - Platform ownership (HA, Scrypted, Hue, Aqara)
 - [homekit-exposure-list.md](homekit-exposure-list.md) - 20 devices exposed
 - [phase0-finalized-inventory.md](phase0-finalized-inventory.md) - Original analysis
