@@ -18,8 +18,8 @@
 │ Home       │ │Scrypted │ │ Apple TV │ │ Hue Bridge   │
 │ Assistant  │ │ (HKSV)  │ │ (Matter) │ │ (Native HK)  │
 │ Bridge     │ └────┬────┘ └────┬─────┘ └──────┬───────┘
-└─────┬──────┘      │           │               │
-      │             │           │               │
+└─────┬──────┘      │           │              │
+      │             │           │              │
   ┌───┴───┐    ┌────┴────┐ ┌────┴─────┐   ┌────┴─────┐
   │ WiFi/ │    │ Cameras │ │ Matter   │   │ Hue      │
   │Zigbee │    │ (Tapo)  │ │ Devices  │   │ Lights   │
