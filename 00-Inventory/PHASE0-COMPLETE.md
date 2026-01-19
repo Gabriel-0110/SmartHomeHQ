@@ -132,26 +132,9 @@
 
 ---
 
-## Outstanding Questions (Non-Blocking)
+## Ready for Phase 1
 
-1. **Scrypted Multiple IPs** - Which is primary: .224, .209, or .171?
-2. **Control Room Location** - Dedicated room or collocated with Office/Bedroom?
-3. **CR1000A VLAN Support** - Research capabilities via Verizon app
-4. **HP Printer** - Does HA integration support useful HomeKit entities?
-
-**Action**: Address during Phase 1 planning
-
----
-
-## Commands to Start Phase 1
-
-```bash
-# Option 1: Use skill
-/phase1-network
-
-# Option 2: Manual reference
-See roadmap.md lines 26-50
-```
+See [phase1-preflight-checklist.md](../01-Network/phase1-preflight-checklist.md) for user action items before starting Phase 1.
 
 ---
 

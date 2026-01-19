@@ -11,23 +11,20 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                         HomeKit                              │
 │                    (User Interface)                          │
-└───────────────────────┬─────────────────────────────────────┘
-                        │
-        ┌───────────────┼───────────────┬─────────────────┐
-        │               │               │                 │
-        ▼               ▼               ▼                 ▼
-┌──────────────┐ ┌──────────┐  ┌──────────────┐ ┌──────────────┐
-│ Home         │ │ Scrypted │  │ Homebridge   │ │ Native       │
-│ Assistant    │ │          │  │              │ │ HomeKit      │
-│ (via Bridge) │ │ (HKSV)   │  │ (Niche only) │ │ (Direct)     │
-└──────┬───────┘ └────┬─────┘  └──────┬───────┘ └──────┬───────┘
-       │              │               │                │
-       │              │               │                │
-  ┌────┴────┐    ┌────┴────┐    ┌────┴────┐     ┌─────┴─────┐
-  │ Devices │    │ Cameras │    │ Niche   │     │ Hue       │
-  │ (WiFi/  │    │ (Tapo)  │    │ Devices │     │ Bridge    │
-  │ Zigbee) │    └─────────┘    └─────────┘     │ (direct)  │
-  └─────────┘                                    └───────────┘
+└──────┬────────────┬─────────────┬──────────────┬────────────┘
+       │            │             │              │
+       ▼            ▼             ▼              ▼
+┌────────────┐ ┌─────────┐ ┌──────────┐ ┌──────────────┐
+│ Home       │ │Scrypted │ │ Apple TV │ │ Hue Bridge   │
+│ Assistant  │ │ (HKSV)  │ │ (Matter) │ │ (Native HK)  │
+│ Bridge     │ └────┬────┘ └────┬─────┘ └──────┬───────┘
+└─────┬──────┘      │           │               │
+      │             │           │               │
+  ┌───┴───┐    ┌────┴────┐ ┌────┴─────┐   ┌────┴─────┐
+  │ WiFi/ │    │ Cameras │ │ Matter   │   │ Hue      │
+  │Zigbee │    │ (Tapo)  │ │ Devices  │   │ Lights   │
+  │Devices│    └─────────┘ └──────────┘   └──────────┘
+  └───────┘
 ```
 
 ---
@@ -53,15 +50,13 @@
 
 | Device | Current Path | Exposure Method | Notes |
 |--------|-------------|-----------------|-------|
-| Bedroom Vanity Light | Hue Bridge → HomeKit | Native | Adaptive Lighting in HomeKit |
-| Office Floor Lamp | Hue Bridge → HomeKit | Native | - |
-| Bathroom Mirror 1 | Hue Bridge → HomeKit | Native | - |
-| Bathroom Mirror 2 | Hue Bridge → HomeKit | Native | - |
-| Bathroom Mirror 3 | Hue Bridge → HomeKit | Native | - |
+| Bedroom Vanity Light | Hue Bridge → HomeKit | Native | HA Adaptive Lighting via Hue integration |
+| Office Floor Lamp | Hue Bridge → HomeKit | Native | HA Adaptive Lighting via Hue integration |
+| Bathroom Mirror 1 | Hue Bridge → HomeKit | Native | HA Adaptive Lighting via Hue integration |
+| Bathroom Mirror 2 | Hue Bridge → HomeKit | Native | HA Adaptive Lighting via Hue integration |
+| Bathroom Mirror 3 | Hue Bridge → HomeKit | Native | HA Adaptive Lighting via Hue integration |
 
-**Current Issue**: Listed as exposed via HA in inventory. Should verify if double-exposed.
-
-**Migration**: Remove from HA HomeKit bridge if present, use Hue Bridge's native HomeKit only.
+**Phase 0 Decision**: Use Hue Bridge native HomeKit for exposure, HA Adaptive Lighting Component for automation.
 
 ---
 
@@ -148,24 +143,20 @@
 
 ## HomeKit Bridge Architecture
 
-### Current Setup (Inferred)
-- **Multiple HomeKit Bridge instances** in HA (seen in screenshots)
-- Possible issue: Multiple bridges can cause confusion and performance issues
-
-### Recommended Architecture
-- **Single HA HomeKit Bridge** for all HA-managed devices
+### Phase 0 Strategy
+- **Single HA HomeKit Bridge** for all HA-managed devices (11 devices)
 - **Separate native bridges**:
-  - Hue Bridge (native HomeKit)
-  - Scrypted (HKSV cameras)
-  - Aqara Hub M2 (decide: direct or via HA)
-- **Homebridge instance**: Only if needed for niche devices
+  - Hue Bridge (native HomeKit) - 5 lights
+  - Scrypted (HKSV cameras) - 4 cameras
+  - Apple TV Matter (native Matter) - 2 devices
+- **Homebridge**: Reserved for niche devices only (currently none)
 
-### Migration Action Items
-1. Audit current HA HomeKit bridge instances
-2. Consolidate into single bridge with proper entity filtering
-3. Remove Hue devices from HA HomeKit bridge (if present)
-4. Verify Aqara device exposure strategy
-5. Document Homebridge usage (or deprecate if unused)
+### Implementation (Phase 2/3)
+1. Audit current HA HomeKit bridge configuration
+2. Consolidate into single bridge with entity filtering
+3. Ensure Hue devices NOT exposed via HA bridge
+4. Configure Aqara sensors via HA bridge
+5. Verify Matter integration for HA automations
 
 ---
 
@@ -195,8 +186,14 @@
 
 ---
 
-## Next Steps
-1. **User Decision Required**: Aqara sensor exposure strategy (HA bridge vs direct)
-2. **Audit**: Current HA HomeKit bridge configuration (how many instances? which entities?)
-3. **Verify**: Are Hue devices currently double-exposed (HA + Hue Bridge)?
-4. **Document**: Homebridge current usage (if any)
+## Phase 0 Decisions Complete ✅
+
+**Ownership strategy finalized**:
+1. ✅ Aqara sensor exposure strategy decided: **Via HA HomeKit Bridge**
+2. ✅ Hue lights ownership: **Direct via Hue Bridge native HomeKit**
+3. ✅ Matter devices ownership: **Direct via Apple TV Matter controller**
+4. ✅ WiFi plugs/lights ownership: **Via HA HomeKit Bridge**
+5. ✅ Cameras ownership: **Via Scrypted HKSV**
+6. ✅ Homebridge usage: **Reserved for niche devices only**
+
+**Phase 2/3 will implement**: Audit and configure HA HomeKit Bridge, verify Hue double-exposure, document Homebridge usage.

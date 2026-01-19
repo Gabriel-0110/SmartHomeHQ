@@ -201,55 +201,19 @@
 
 ---
 
-## Network Implications (For Phase 1)
+## Phase 0 Files
 
-### WiFi Device Count: 14
-- 4x Cameras (Tapo C110) → **Camera VLAN**
-- 2x Echo devices → **IoT VLAN**
-- 2x Govee lights → **IoT VLAN**
-- 2x Kasa plugs → **IoT VLAN**
-- 2x Apple TV → **Trusted VLAN** (HomeKit hubs)
-- 1x iPad → **Trusted VLAN** (dashboard)
-- 1x Govee TV light strip → **IoT VLAN**
-
-### Zigbee Device Count: 18
-- Zigbee devices don't need VLAN segregation (isolated via hubs)
-- Hubs (Hue Bridge, Aqara M2) → **Trusted or IoT VLAN** (to be decided in Phase 1)
+- [device-inventory.csv](device-inventory.csv) - Complete device list (38 devices)
+- [ownership-map.md](ownership-map.md) - Platform ownership strategy
+- [homekit-exposure-list.md](homekit-exposure-list.md) - 22 devices exposed to HomeKit
+- [phase0-decisions.md](phase0-decisions.md) - All architectural decisions
+- [matter-zigbee-decision.md](matter-zigbee-decision.md) - Matter vs Zigbee priority
+- **This file**: Phase 0 complete summary
 
 ---
 
-## Missing Information / Next Steps
+## Phase 0 Status: ✅ COMPLETE
 
-### 1. IP Addresses
-- Only Kitchen Camera has documented IP (192.168.1.205)
-- Need IPs for:
-  - HA VM
-  - Scrypted host
-  - Homebridge host (if used)
-  - Other 3 cameras
-  - WiFi devices (for static assignment in Phase 1)
+All architectural decisions finalized. Ready to proceed to **Phase 1: Network Segmentation**.
 
-### 2. Control Room Physical Setup
-- Is "Control Room" a dedicated equipment room/closet?
-- Or is it collocated with another area (Office, Bedroom)?
-- Helps with network planning (cable runs, WiFi coverage)
-
-### 3. Router/Network Details
-- Still need from Phase 1: Verizon router model, VLAN support, current SSID setup
-
----
-
-## Files Generated
-
-- [device-inventory.csv](device-inventory.csv) - Complete device list (35 devices)
-- [ownership-map.md](ownership-map.md) - Platform ownership (HA, Scrypted, Hue, Aqara)
-- [homekit-exposure-list.md](homekit-exposure-list.md) - 20 devices exposed
-- [phase0-finalized-inventory.md](phase0-finalized-inventory.md) - Original analysis
-- [phased-migration-roadmap.md](phased-migration-roadmap.md) - Migration plan
-- **This file**: Updated summary with all discovered devices
-
----
-
-## Phase 0 Status: ✅ COMPLETE (with noted gaps to fill)
-
-**Next Action**: Fill in missing information (see above), then proceed to Phase 1 (Network Segmentation).
+See [phase1-preflight-checklist.md](../01-Network/phase1-preflight-checklist.md) for user action items before Phase 1.

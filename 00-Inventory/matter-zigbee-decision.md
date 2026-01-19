@@ -143,32 +143,14 @@ The Aqara Hub M2 and Philips Hue Bridge v2 both support dual connectivity:
 
 ## Recommendations
 
-### Immediate Actions
+### Phase 0 Decisions Complete ✅
 1. ✅ Update P2 sensor to Matter protocol (Apple TV hub)
 2. ✅ Update Govee TV strip to Matter protocol (Apple TV hub)
-3. ✅ Expose P2 sensor to HomeKit (now possible as user-facing device)
-4. Keep Hue lights on Zigbee (Hue Bridge native HomeKit)
-5. Keep Aqara Zigbee devices on M2 Hub (via HA HomeKit Bridge)
-
-### Phase 1+ Actions
-6. Research Hue Bridge v2 Matter firmware updates (future migration)
-7. Monitor Aqara M2 Matter support improvements
-8. Set up HomeKit Adaptive Lighting via HA (per previous decision)
-9. Test Matter device responsiveness vs Zigbee
-10. Document migration plan for Zigbee → Matter (when ready)
-
----
-
-## Validation Checklist
-
-- [x] P2 sensor updated to Matter protocol
-- [x] Govee TV strip updated to Matter protocol
-- [x] P2 sensor exposed to HomeKit (user-facing motion sensor)
-- [x] Protocol breakdown updated
-- [x] Hub strategy documented
-- [ ] Test P2 sensor in Home app (Phase 1+)
-- [ ] Test Govee strip via Matter (Phase 1+)
-- [ ] Verify HA Matter integration configured (Phase 1+)
+3. ✅ Expose P2 sensor to HomeKit (user-facing device)
+4. ✅ Keep Hue lights on Zigbee (Hue Bridge native HomeKit)
+5. ✅ Keep Aqara Zigbee devices on M2 Hub (via HA HomeKit Bridge)
+6. ✅ Protocol breakdown updated
+7. ✅ Hub strategy documented
 
 ---
 
@@ -177,3 +159,5 @@ The Aqara Hub M2 and Philips Hue Bridge v2 both support dual connectivity:
 **Decision**: Use Matter for new/Matter-only devices (P2, Govee strip), keep Zigbee for existing stable devices (Hue, Aqara). Prioritize Matter for all future purchases. Plan gradual migration as hubs mature.
 
 **Outcome**: Future-proof architecture while maintaining stability of current Zigbee mesh.
+
+**Phase 0 Complete** - Implementation and testing will occur in Phase 2/3.
