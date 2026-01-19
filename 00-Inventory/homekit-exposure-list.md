@@ -351,25 +351,23 @@ Examples:
 
 ## Migration Checklist: HomeKit Exposure
 
-### Pre-Migration
+### Pre-Migration (Phase 0 - Before Implementation)
 - [ ] Document current HomeKit Bridge configuration in HA
 - [ ] List all entities currently exposed to HomeKit
 - [ ] Identify any duplicate exposures (same device via multiple bridges)
-- [ ] Standardize entity naming in HA
 
-### Migration Steps
+### Migration Steps (Phase 2/3 - After Network Segmentation)
 1. [ ] Remove Hue devices from HA HomeKit Bridge (if present)
 2. [ ] Create single consolidated HA HomeKit Bridge with filtered entities
 3. [ ] Verify Scrypted cameras are exposed with HKSV enabled
 4. [ ] Test each exposed device in Home app
 5. [ ] Configure HomeKit rooms/zones to match HA areas
-6. [ ] Enable Adaptive Lighting on Hue devices (Home app)
-7. [ ] Set up HA Adaptive Lighting for WiFi lights (if desired)
+6. [ ] Install HA Adaptive Lighting integration (HACS)
+7. [ ] Configure HA Adaptive Lighting for ALL lights (Hue + Govee)
 
-### Post-Migration
+### Post-Migration (Phase 2/3 Completion)
 - [ ] Remove old/duplicate HomeKit Bridge instances
 - [ ] Document final exposure list
-- [ ] Create user guide for which devices are in HomeKit vs HA-only
 - [ ] Test Siri commands for each exposed device
 
 ---
