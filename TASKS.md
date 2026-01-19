@@ -19,12 +19,19 @@ Legend:
 - [x] Update `roadmap.md` with refined cutover/rollback plan
 
 **Phase 0 Outputs:**
-- [device-inventory.csv](00-Inventory/device-inventory.csv) - 19 devices catalogued
+- [device-inventory.csv](00-Inventory/device-inventory.csv) - **34 devices catalogued** (updated)
 - [ownership-map.md](00-Inventory/ownership-map.md) - Platform ownership defined
-- [homekit-exposure-list.md](00-Inventory/homekit-exposure-list.md) - 13 devices to expose
+- [homekit-exposure-list.md](00-Inventory/homekit-exposure-list.md) - **20 devices to expose** (updated)
 - [phase0-finalized-inventory.md](00-Inventory/phase0-finalized-inventory.md) - Complete analysis
+- [phase0-summary.md](00-Inventory/phase0-summary.md) - **Updated summary with all devices**
 - [phased-migration-roadmap.md](00-Inventory/phased-migration-roadmap.md) - Detailed migration guide
 - [screenshots/](00-Inventory/screenshots/) - HA integrations reference images
+
+**Phase 0 Key Findings:**
+- **34 total devices** (was 19) - discovered 15 additional devices
+- **20 devices exposed to HomeKit** (was 13)
+- **7 Hue lights, 4 cameras, 11 Aqara sensors, 2 Echo devices, 2 Apple TVs, iPad dashboard**
+- **Missing info**: 2 Hue light locations, most IP addresses, Aqara M2 hub count (1 or 2?)
 
 ## Next (Phase 1 — Network)
 - [ ] Confirm Verizon router model + capabilities (VLAN? guest isolation? mDNS?)
