@@ -86,3 +86,7 @@ __pycache__/
 99-Exports/*secret*
 99-Exports/*credential*
 99-Exports/*password*
+
+# Claude AI tool settings and cache
+.claude/settings.local.json
+.claude/cache/

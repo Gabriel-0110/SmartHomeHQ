@@ -9,6 +9,7 @@ Bedroom,Bedroom TV Light Strip,Govee,,WiFi,Home Assistant,,yes,Sync with TV mode
 Bedroom,Safe Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,no,Security trigger when Away
 Office,Office Floor Lamp,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Office,Govee Hex Panels,Govee,,WiFi,Home Assistant,,yes,
+Office,Office Camera,Tapo,C110,WiFi,Scrypted,,yes,RTSP stream via Scrypted
 Kitchen,Kitchen Camera,Tapo,C110,WiFi,Scrypted,192.168.1.205,yes,RTSP stream1/2 via Scrypted
 Hallway,Hallway Camera,Tapo,C110,WiFi,Scrypted,,yes,
 Entrance,Entrance Camera,Tapo,C110,WiFi,Scrypted,,yes,

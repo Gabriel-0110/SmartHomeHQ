@@ -1,0 +1,297 @@
+# HomeKit Exposure Strategy
+
+**Date:** 2026-01-18
+**Purpose:** Define which devices are exposed to HomeKit and the method of exposure
+
+---
+
+## Exposure Principles
+
+### 1. User-Facing Devices → Expose to HomeKit
+Devices that users directly interact with via Siri, Home app, or physical automation.
+
+### 2. Automation-Only Devices → Keep in HA Only
+Sensors and triggers that only drive background automations (not user-controlled).
+
+### 3. Native HomeKit First
+If a device/hub has native HomeKit support, prefer direct connection over HA bridge.
+
+### 4. Single Bridge Architecture
+Avoid exposing the same device through multiple HomeKit bridges (causes conflicts).
+
+---
+
+## HomeKit Exposure List
+
+### ✅ Expose to HomeKit (13 devices)
+
+#### **Lights (6 devices)**
+| Device | Exposure Method | Rationale |
+|--------|----------------|-----------|
+| Bedroom Vanity Light | Hue Bridge (native) | User control + Adaptive Lighting |
+| Office Floor Lamp | Hue Bridge (native) | User control |
+| Bathroom Lights | Hue Bridge (native) | User control |
+| Bedroom TV Light Strip | HA HomeKit Bridge | TV mode sync automation + user control |
+| Office Hex Panels | HA HomeKit Bridge | User control |
+
+**4th Hue light**: Need to identify from HA (possibly another room?)
+
+#### **Plugs/Switches (3 devices)**
+| Device | Exposure Method | Rationale |
+|--------|----------------|-----------|
+| Bedroom TV Plug | HA HomeKit Bridge | User control + HA schedules |
+| Bedroom Air Purifier Plug | HA HomeKit Bridge | User control + presence automation |
+| Hallway Wireless Switch | HA HomeKit Bridge | Scene control |
+
+#### **Cameras (4 devices)**
+| Device | Exposure Method | Rationale |
+|--------|----------------|-----------|
+| Kitchen Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
+| Hallway Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
+| Entrance Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
+| Office Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
+
+#### **Sensors (1 device)** - Decision needed
+| Device | Exposure Method | Rationale |
+|--------|----------------|-----------|
+| Entrance Door Contact Sensor | HA HomeKit Bridge OR Aqara native | Perimeter alert + Home/Away mode trigger |
+
+---
+
+### ❌ Do NOT Expose to HomeKit (5 devices)
+
+#### **Automation-Only Sensors**
+| Device | Kept In | Rationale |
+|--------|---------|-----------|
+| Bedroom Safe Contact Sensor | HA + Aqara Hub | Security automation trigger (not user-controlled) |
+| Bathroom Motion Sensor | HA + Aqara Hub | Lighting automation trigger (not user-controlled) |
+
+#### **Infrastructure**
+| Device | Kept In | Rationale |
+|--------|---------|-----------|
+| Home Assistant | - | Backend hub |
+| Scrypted | - | Backend camera processor |
+| Homebridge | - | Backend bridge (if used) |
+
+---
+
+## Exposure Method Details
+
+### Method 1: Native HomeKit (Hue Bridge)
+**Devices**: 4x Hue lights
+
+**Setup**:
+1. Hue Bridge already paired to HomeKit
+2. All Hue devices automatically appear in Home app
+3. HA can still control via Hue Bridge integration (for automations)
+
+**Pros**:
+- Fastest response time
+- No HA dependency for HomeKit control
+- Adaptive Lighting support
+
+**Cons**:
+- Must manage in two places (Home app + HA)
+
+**Action**: Remove Hue devices from HA HomeKit Bridge if currently exposed there.
+
+---
+
+### Method 2: HA HomeKit Bridge (WiFi Devices + Sensors)
+**Devices**: Kasa plugs, Govee lights, Aqara sensors/switches
+
+**Setup**:
+1. Single HA HomeKit Bridge integration
+2. Entity filtering to expose only desired devices
+3. Accessory mode vs Bridge mode selection
+
+**Configuration** (in HA `configuration.yaml`):
+```yaml
+homekit:
+  - name: Primary Bridge
+    port: 21063
+    filter:
+      include_entities:
+        - switch.bedroom_tv_plug
+        - switch.bedroom_air_purifier_plug
+        - light.bedroom_tv_light_strip
+        - light.office_hex_panels
+        - binary_sensor.entrance_door_contact
+        - sensor.hallway_wireless_switch
+```
+
+**Pros**:
+- Single management point (HA)
+- Advanced automation capabilities
+- Custom entity configuration
+
+**Cons**:
+- Requires HA to be online
+- Slightly higher latency vs native
+
+---
+
+### Method 3: Scrypted HKSV (Cameras)
+**Devices**: 4x Tapo C110 cameras
+
+**Setup**:
+1. Tapo cameras added to Scrypted
+2. Scrypted Camera Bridge plugin
+3. HKSV enabled for 24/7 recording
+
+**Pros**:
+- Native HKSV recording
+- RTSP stream optimization
+- 10-day recording with iCloud+
+
+**Cons**:
+- Requires iCloud+ subscription
+- Requires Scrypted always-on server
+
+---
+
+## HomeKit Room/Zone Mapping
+
+### Recommended HomeKit Home Structure
+```
+SmartHomeHQ (Home)
+├── Bedroom
+│   ├── Vanity Light (Hue)
+│   ├── TV Plug (Kasa via HA)
+│   ├── Air Purifier Plug (Kasa via HA)
+│   └── TV Light Strip (Govee via HA)
+├── Office
+│   ├── Floor Lamp (Hue)
+│   ├── Hex Panels (Govee via HA)
+│   └── Camera (Scrypted HKSV)
+├── Kitchen
+│   ├── Bathroom Lights (Hue)
+│   └── Camera (Scrypted HKSV)
+├── Hallway
+│   ├── Camera (Scrypted HKSV)
+│   └── Wireless Switch (Aqara via HA)
+├── Entrance
+│   ├── Camera (Scrypted HKSV)
+│   └── Door Contact Sensor (via HA) - OPTIONAL
+└── Bathroom
+    └── Lights (Hue)
+```
+
+**Note**: HomeKit room names should match HA areas for consistency.
+
+---
+
+## Entity Naming Convention
+
+### Current Naming (from inventory)
+- Inconsistent: Some use area prefix, some don't
+- Examples: "Bedroom Vanity Light" vs "Safe Contact Sensor"
+
+### Recommended Naming in HA (for HomeKit)
+**Format**: `[area]_[device_type]_[descriptor]`
+
+Examples:
+- `bedroom_light_vanity`
+- `bedroom_switch_tv_plug`
+- `entrance_sensor_door_contact`
+- `hallway_button_wireless_switch`
+
+**Rationale**:
+- Siri recognition: "Turn on bedroom vanity light"
+- Sorting/filtering in automations
+- Consistency across platforms
+
+**Action**: Standardize entity IDs in HA before exposing to HomeKit.
+
+---
+
+## Automation-Only Devices: Why NOT Expose?
+
+### Bedroom Safe Contact Sensor
+- **Purpose**: Trigger "Safe opened while Away" security alert
+- **User Interaction**: None (passive monitoring)
+- **HomeKit Benefit**: Minimal (would just show "Open/Closed" in Home app)
+- **Recommendation**: Keep in HA automations only
+
+### Bathroom Motion Sensor
+- **Purpose**: Trigger bathroom light automation
+- **User Interaction**: None (passive detection)
+- **HomeKit Benefit**: None (HomeKit motion sensors are for automation triggers, not control)
+- **Recommendation**: Keep in HA automations only
+
+**Key Principle**: If a device is never manually controlled or queried by the user, don't expose it to HomeKit.
+
+---
+
+## Adaptive Lighting Strategy
+
+### Current Setup
+- "Use Adaptive Lighting in HomeKit" noted for Bedroom Vanity Light
+
+### Adaptive Lighting Options
+
+#### Option 1: HomeKit Native Adaptive Lighting
+- **Requirement**: Light must be exposed directly to HomeKit (not via HA bridge)
+- **Supported**: Hue lights (via Hue Bridge native)
+- **Configuration**: Enable in Home app for each light
+- **Pros**: Native iOS integration, works without HA
+- **Cons**: Cannot use HA's Adaptive Lighting component simultaneously
+
+#### Option 2: HA Adaptive Lighting Component
+- **Requirement**: HA Adaptive Lighting integration (HACS)
+- **Supported**: All lights controlled by HA
+- **Configuration**: Per-light or per-area automations
+- **Pros**: More customization, automation-based triggers
+- **Cons**: Requires HA online, conflicts with HomeKit Adaptive Lighting
+
+**Recommendation**:
+- **Hue lights**: Use HomeKit native Adaptive Lighting (already exposed directly)
+- **WiFi lights** (Govee): Use HA Adaptive Lighting component (exposed via HA bridge)
+
+**Action**: Verify Hue lights are NOT exposed via HA HomeKit Bridge to avoid conflicts.
+
+---
+
+## Special Considerations
+
+### Google Assistant Integration
+- Seen in HA screenshots
+- **Decision Needed**: Keep Google Assistant, or migrate fully to HomeKit/Siri?
+- **Recommendation**: If migrating to "HomeKit-first" strategy, deprecate Google Assistant to reduce complexity.
+
+### Telegram/Notification Services
+- Used for security alerts (e.g., safe opened, door contact)
+- **Keep**: These are backend automation services, not affected by HomeKit strategy
+
+---
+
+## Migration Checklist: HomeKit Exposure
+
+### Pre-Migration
+- [ ] Document current HomeKit Bridge configuration in HA
+- [ ] List all entities currently exposed to HomeKit
+- [ ] Identify any duplicate exposures (same device via multiple bridges)
+- [ ] Standardize entity naming in HA
+
+### Migration Steps
+1. [ ] Remove Hue devices from HA HomeKit Bridge (if present)
+2. [ ] Create single consolidated HA HomeKit Bridge with filtered entities
+3. [ ] Verify Scrypted cameras are exposed with HKSV enabled
+4. [ ] Test each exposed device in Home app
+5. [ ] Configure HomeKit rooms/zones to match HA areas
+6. [ ] Enable Adaptive Lighting on Hue devices (Home app)
+7. [ ] Set up HA Adaptive Lighting for WiFi lights (if desired)
+
+### Post-Migration
+- [ ] Remove old/duplicate HomeKit Bridge instances
+- [ ] Document final exposure list
+- [ ] Create user guide for which devices are in HomeKit vs HA-only
+- [ ] Test Siri commands for each exposed device
+
+---
+
+## Next Steps
+1. **User Input**: Confirm Adaptive Lighting strategy preference
+2. **User Input**: Google Assistant - keep or deprecate?
+3. **Technical Task**: Audit current HA HomeKit Bridge configuration
+4. **Technical Task**: Implement entity naming standardization
