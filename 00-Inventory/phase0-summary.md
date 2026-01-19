@@ -9,16 +9,17 @@
 
 | Category | Count |
 |----------|-------|
-| **Total Devices** | 35 (excluding infrastructure) |
+| **Total Devices** | 38 (excluding infrastructure) |
 | **Infrastructure** | 3 (HA, Scrypted, Homebridge) |
 | **Hubs/Controllers** | 4 (Apple TV, Aqara M2, Hue Bridge, NFC Bundle) |
-| **HomeKit Exposed** | 20 devices (57%) |
+| **HomeKit Exposed** | 22 devices (58%) |
 | **Cameras** | 4 (Tapo C110) |
-| **Lights** | 9 (Hue x7, Govee x2) |
-| **Sensors** | 12 (contact x6, motion x2, NFC x4) |
-| **Plugs/Switches** | 4 (Kasa x2, Govee strip x1, Aqara wireless x1) |
-| **Voice Assistants** | 2 (Echo Show 8, Echo Dot) |
+| **Lights** | 7 (Hue x5, Govee x2) |
+| **Sensors** | 13 (contact x6, motion x2, NFC x3, switch x1, microwave x1) |
+| **Plugs** | 2 (Kasa x2) |
+| **Voice Assistants** | 3 (Echo Show 8, Echo Dot, Nest Mini) |
 | **Media Devices** | 3 (Apple TV x2, iPad dashboard) |
+| **Appliances** | 2 (Microwave, Printer) |
 
 ---
 
@@ -101,8 +102,9 @@
 
 | Protocol | Count | Devices |
 |----------|-------|---------|
-| **Zigbee** | 18 | Hue lights (7) + Aqara sensors/switches (11) |
-| **WiFi** | 14 | Cameras (4), Govee (2), Kasa (2), Echo (2), Apple TV (2), iPad (1) |
+| **Zigbee** | 16 | Hue lights (5) + Aqara sensors/switches (10: 6 contact, 1 motion P1, 1 switch, 3 NFC assigned) |
+| **Matter** | 2 | P2 motion sensor, Govee TV light strip |
+| **WiFi** | 17 | Cameras (4), Govee panels (1), Kasa (2), Echo (2), Apple TV (2), iPad (1), Nest Mini (1), Microwave (1), Printer (1) |
 | **NFC** | 3+ | NFC Tags (3 assigned + 30-35 in bundle) |
 | **LAN** | 3 | HA, Scrypted, Homebridge (infrastructure) |
 

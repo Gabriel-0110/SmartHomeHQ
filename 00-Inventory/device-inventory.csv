@@ -9,13 +9,13 @@ Control Room,NFC Tags Bundle,NFC,,NFC,Home Assistant,,no,30-35 tags for automati
 Bedroom,Bedroom Vanity Light,Philips Hue,,Zigbee,Hue Bridge,,yes,Use Adaptive Lighting in HomeKit
 Bedroom,Bedroom TV Plug,Kasa,,WiFi,Home Assistant,,yes,TV power control
 Bedroom,Bedroom Air Purifier Plug,Kasa,,WiFi,Home Assistant,,yes,Schedules + presence
-Bedroom,Bedroom TV Light Strip,Govee,,WiFi,Home Assistant,,yes,Sync with TV modes
+Bedroom,Bedroom TV Light Strip,Govee,,Matter,Apple TV (Hub),,yes,Sync with TV modes (Matter device)
 Bedroom,Safe Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,no,Security trigger when Away
 Bedroom,Window Left Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,yes,Perimeter security + ventilation automation
 Bedroom,Window Right Contact Sensor,Aqara,Contact Sensor,Zigbee,Aqara Hub M2,,yes,Perimeter security + ventilation automation
 Bedroom,Echo Show 8,Amazon,Echo Show 8,WiFi,Direct,,no,Alarm clock + voice assistant
 Bedroom,Apple TV,Apple,Apple TV,WiFi,Direct,,no,Media player + HomeKit hub
-Bedroom,Motion & Illumination Sensor (P2),Aqara,Motion & Light Sensor,Zigbee,Aqara Hub M2,,no,Presence detection + light automation
+Bedroom,Motion & Illumination Sensor (P2),Aqara,Motion & Light Sensor,Matter,Apple TV (Hub),,yes,Presence detection + light automation (Matter-only device)
 Bedroom,NFC Tag 1,NFC,,NFC,Home Assistant,,no,Automation trigger
 Office,Office Floor Lamp,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Office,Govee Hex Panels,Govee,,WiFi,Home Assistant,,yes,
@@ -32,7 +32,7 @@ Hallway,iPad 5th Gen Panel,Apple,iPad 5th Gen,WiFi,Direct,,no,Wall-mounted dashb
 Bathroom,Baño Mirror 1,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Bathroom,Baño Mirror 2,Philips Hue,,Zigbee,Hue Bridge,,yes,
 Bathroom,Baño Mirror 3,Philips Hue,,Zigbee,Hue Bridge,,yes,
-Bathroom,Motion & Illumination Sensor (P1),Aqara,Motion & Light Sensor,Zigbee,Aqara Hub M2,,no,Drives HA automation
+Bathroom,Motion & Illumination Sensor (P1),Aqara,Motion & Light Sensor,Zigbee,Aqara Hub M2,,yes,Drives HA automation + user awareness
 Bathroom,Nest Mini (1st Gen),Google,Smart Speaker,WiFi,Direct,,no,Voice assistant + speaker
 Kitchen,Microwave Oven,Toshiba,ML-SEM23P(BS),WiFi,Home Assistant,,yes,Smart microwave control
 Office,Printer,HP,Deskjet 3630,WiFi,Home Assistant,,no,Wireless printing
