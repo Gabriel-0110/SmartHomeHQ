@@ -349,31 +349,18 @@ Examples:
 
 ---
 
-## Migration Checklist: HomeKit Exposure
-
-### Pre-Migration (Phase 0 - Before Implementation)
-- [ ] Document current HomeKit Bridge configuration in HA
-- [ ] List all entities currently exposed to HomeKit
-- [ ] Identify any duplicate exposures (same device via multiple bridges)
-
-### Migration Steps (Phase 2/3 - After Network Segmentation)
-1. [ ] Remove Hue devices from HA HomeKit Bridge (if present)
-2. [ ] Create single consolidated HA HomeKit Bridge with filtered entities
-3. [ ] Verify Scrypted cameras are exposed with HKSV enabled
-4. [ ] Test each exposed device in Home app
-5. [ ] Configure HomeKit rooms/zones to match HA areas
-6. [ ] Install HA Adaptive Lighting integration (HACS)
-7. [ ] Configure HA Adaptive Lighting for ALL lights (Hue + Govee)
-
-### Post-Migration (Phase 2/3 Completion)
-- [ ] Remove old/duplicate HomeKit Bridge instances
-- [ ] Document final exposure list
-- [ ] Test Siri commands for each exposed device
-
----
-
 ## Next Steps
-1. **User Input**: Confirm Adaptive Lighting strategy preference
-2. **User Input**: Google Assistant - keep or deprecate?
-3. **Technical Task**: Audit current HA HomeKit Bridge configuration
-4. **Technical Task**: Implement entity naming standardization
+
+### Phase 0 - Complete ✅
+1. ✅ **User Input**: Adaptive Lighting strategy confirmed (HA Component for ALL lights)
+2. ✅ **User Input**: Google Assistant confirmed (Keep with Nest Mini)
+
+### Phase 1 - Network Segmentation (Next)
+- See [phase1-preflight-checklist.md](../01-Network/phase1-preflight-checklist.md) for user actions
+
+### Phase 2/3 - HomeKit Bridge Implementation (After Phase 1)
+- **Technical Task**: Audit current HA HomeKit Bridge configuration
+- **Technical Task**: Implement consolidated HomeKit Bridge (see Implementation Checklist above)
+
+### Phase 4 - Entity Naming Standardization (After Phase 2/3)
+- **Technical Task**: Standardize all entity IDs and friendly names
