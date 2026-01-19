@@ -23,7 +23,7 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 
 ## HomeKit Exposure List
 
-### ✅ Expose to HomeKit (20 devices)
+### ✅ Expose to HomeKit (22 devices)
 
 #### **Lights (7 devices)**
 | Device | Exposure Method | Rationale |
@@ -33,15 +33,14 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 | Bathroom Mirror 1 | Hue Bridge (native) | User control |
 | Bathroom Mirror 2 | Hue Bridge (native) | User control |
 | Bathroom Mirror 3 | Hue Bridge (native) | User control |
-| Bedroom TV Light Strip | HA HomeKit Bridge | TV mode sync automation + user control |
+| Bedroom TV Light Strip | Apple TV Matter | TV mode sync automation + user control (Matter device) |
 | Office Hex Panels | HA HomeKit Bridge | User control |
 
-#### **Plugs/Switches (3 devices)**
+#### **Plugs (2 devices)**
 | Device | Exposure Method | Rationale |
 |--------|----------------|-----------|
 | Bedroom TV Plug | HA HomeKit Bridge | User control + HA schedules |
 | Bedroom Air Purifier Plug | HA HomeKit Bridge | User control + presence automation |
-| Hallway Wireless Switch | HA HomeKit Bridge | Scene control |
 
 #### **Cameras (4 devices)**
 | Device | Exposure Method | Rationale |
@@ -51,7 +50,7 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 | Entrance Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
 | Office Camera | Scrypted (HKSV) | Security monitoring + HKSV recording |
 
-#### **Sensors (5 devices)**
+#### **Sensors (7 devices)**
 | Device | Exposure Method | Rationale |
 |--------|----------------|-----------|
 | Bedroom Window Left Contact | HA HomeKit Bridge | Perimeter security + ventilation automation |
@@ -59,25 +58,35 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 | Entrance Door Contact Sensor | HA HomeKit Bridge | Perimeter alert + Home/Away mode trigger |
 | Kitchen Fridge Contact | HA HomeKit Bridge | Door left open monitoring |
 | Hallway Wireless Switch | HA HomeKit Bridge | Scene control |
+| Bathroom Motion Sensor (P1) | HA HomeKit Bridge | Lighting automation + user awareness |
+| Bedroom Motion Sensor (P2) | Apple TV Matter | Presence detection + user awareness (Matter device) |
+
+#### **Appliances (1 device)**
+| Device | Exposure Method | Rationale |
+|--------|----------------|-----------|
+| Kitchen Microwave | HA HomeKit Bridge | Smart control + status monitoring |
+
+#### **Matter Devices (2 devices - counted in categories above)**
+- Bedroom Motion Sensor P2 (Aqara Matter)
+- Bedroom TV Light Strip (Govee Matter)
 
 ---
 
-### ❌ Do NOT Expose to HomeKit (15 devices)
+### ❌ Do NOT Expose to HomeKit (16 devices)
 
-#### **Automation-Only Sensors (5 devices)**
+#### **Automation-Only Sensors (3 devices)**
 | Device | Kept In | Rationale |
 |--------|---------|-----------|
 | Bedroom Safe Contact Sensor | HA + Aqara Hub | Security automation trigger (not user-controlled) |
-| Bathroom Motion Sensor (P1) | HA + Aqara Hub | Lighting automation trigger (not user-controlled) |
-| Bedroom Motion Sensor (P2) | HA + Aqara Hub | Presence detection automation |
 | NFC Tag 1 (Bedroom) | HA | Automation trigger |
 | NFC Tag 2 (Office) | HA | Automation trigger |
 
-#### **Voice Assistants (2 devices)**
+#### **Voice Assistants (3 devices)**
 | Device | Kept In | Rationale |
 |--------|---------|-----------|
 | Echo Show 8 (Bedroom) | Direct | Alarm clock + voice assistant |
 | Echo Dot (Office) | Direct | Voice assistant |
+| Nest Mini (Bathroom) | Direct | Voice assistant + speaker |
 
 #### **Media Devices (3 devices)**
 | Device | Kept In | Rationale |
@@ -93,6 +102,11 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 | Scrypted | - | Backend camera processor |
 | Homebridge | - | Backend bridge (if used) |
 
+#### **Appliances (1 device)**
+| Device | Kept In | Rationale |
+|--------|---------|-----------|
+| HP Printer (Office) | HA | Printing service (no useful HomeKit entities) |
+
 #### **NFC Bundle**
 | Device | Count | Rationale |
 |--------|-------|-----------|
@@ -103,7 +117,7 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 ## Exposure Method Details
 
 ### Method 1: Native HomeKit (Hue Bridge)
-**Devices**: 4x Hue lights
+**Devices**: 5x Hue lights
 
 **Setup**:
 1. Hue Bridge already paired to HomeKit
@@ -122,8 +136,29 @@ Avoid exposing the same device through multiple HomeKit bridges (causes conflict
 
 ---
 
-### Method 2: HA HomeKit Bridge (WiFi Devices + Sensors)
-**Devices**: Kasa plugs, Govee lights, Aqara sensors/switches
+### Method 2: Apple TV Matter
+**Devices**: 2x Matter devices (P2 sensor, Govee TV light strip)
+
+**Setup**:
+1. Apple TV acts as Matter controller
+2. Matter devices paired directly to Apple TV
+3. Automatically appear in HomeKit
+4. HA can still automate via Matter integration
+
+**Pros**:
+- Future-proof protocol
+- Fast, local, reliable
+- No bridge needed
+- Cross-platform compatible
+
+**Cons**:
+- Requires Matter-compatible Apple TV
+- HA automation requires Matter integration
+
+---
+
+### Method 3: HA HomeKit Bridge (WiFi Devices + Sensors)
+**Devices**: Kasa plugs, Govee panels, Aqara sensors, Microwave
 
 **Setup**:
 1. Single HA HomeKit Bridge integration
@@ -137,15 +172,22 @@ homekit:
     port: 21063
     filter:
       include_entities:
+        # Plugs
         - switch.bedroom_tv_plug
         - switch.bedroom_air_purifier_plug
-        - light.bedroom_tv_light_strip
+        # Lights
         - light.office_hex_panels
+        # Contact Sensors
         - binary_sensor.bedroom_window_left_contact
         - binary_sensor.bedroom_window_right_contact
         - binary_sensor.entrance_door_contact
         - binary_sensor.kitchen_fridge_contact
+        # Motion Sensors
+        - binary_sensor.bathroom_motion_p1
+        # Switches
         - sensor.hallway_wireless_switch
+        # Appliances
+        - switch.kitchen_microwave
 ```
 
 **Pros**:
@@ -159,7 +201,7 @@ homekit:
 
 ---
 
-### Method 3: Scrypted HKSV (Cameras)
+### Method 4: Scrypted HKSV (Cameras)
 **Devices**: 4x Tapo C110 cameras
 
 **Setup**:
@@ -184,19 +226,21 @@ homekit:
 ```
 SmartHomeHQ (Home)
 ├── Bedroom
-│   ├── Vanity Light (Hue)
+│   ├── Vanity Light (Hue native)
 │   ├── TV Plug (Kasa via HA)
 │   ├── Air Purifier Plug (Kasa via HA)
-│   ├── TV Light Strip (Govee via HA)
+│   ├── TV Light Strip (Govee Matter)
 │   ├── Window Left Contact (Aqara via HA)
-│   └── Window Right Contact (Aqara via HA)
+│   ├── Window Right Contact (Aqara via HA)
+│   └── Motion Sensor P2 (Aqara Matter)
 ├── Office
-│   ├── Floor Lamp (Hue)
+│   ├── Floor Lamp (Hue native)
 │   ├── Hex Panels (Govee via HA)
 │   └── Camera (Scrypted HKSV)
 ├── Kitchen
 │   ├── Camera (Scrypted HKSV)
-│   └── Fridge Contact (Aqara via HA)
+│   ├── Fridge Contact (Aqara via HA)
+│   └── Microwave (Toshiba via HA)
 ├── Hallway
 │   ├── Camera (Scrypted HKSV)
 │   └── Wireless Switch (Aqara via HA)
@@ -204,12 +248,20 @@ SmartHomeHQ (Home)
 │   ├── Camera (Scrypted HKSV)
 │   └── Door Contact Sensor (Aqara via HA)
 └── Bathroom
-    ├── Mirror 1 (Hue)
-    ├── Mirror 2 (Hue)
-    └── Mirror 3 (Hue)
+    ├── Mirror 1 (Hue native)
+    ├── Mirror 2 (Hue native)
+    ├── Mirror 3 (Hue native)
+    └── Motion Sensor P1 (Aqara via HA)
 ```
 
 **Note**: HomeKit room names should match HA areas for consistency.
+
+**Summary**:
+- **22 total devices** exposed to HomeKit
+- **5** via Hue Bridge (native)
+- **2** via Apple TV Matter
+- **11** via HA HomeKit Bridge
+- **4** via Scrypted HKSV
 
 ---
 

@@ -10,6 +10,7 @@
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Aqara Sensor Exposure | **Option B: Via HA HomeKit Bridge** | Single source of truth, unified control |
+| Matter vs Zigbee Priority | **Matter for new devices, Zigbee stable** | Future-proof while maintaining stability |
 | Adaptive Lighting | **HA Component (HA-first)** | Consistent approach across all lights |
 | Google Assistant | **Keep (with Nest Mini)** | Bathroom speaker in use |
 | Phase 4 Naming | **Proceed** | Building from scratch, organization priority |
@@ -21,12 +22,14 @@
 
 **Decision**: **Option B - Expose via HA HomeKit Bridge**
 
-**Devices Affected**:
+**Devices Affected** (7 sensors exposed to HomeKit):
 - Bedroom Window Left Contact
 - Bedroom Window Right Contact
 - Entrance Door Contact
 - Kitchen Fridge Contact
 - Hallway Wireless Switch
+- Bathroom Motion Sensor (P1)
+- Bedroom Safe Contact (NOT exposed - automation only)
 
 **Implementation**:
 - All Aqara sensors connected to Aqara Hub M2
@@ -44,7 +47,34 @@
 
 ---
 
-## 2. Adaptive Lighting Strategy
+## 2. Matter vs Zigbee Priority
+
+**Decision**: **Prioritize Matter for new/Matter-native devices, keep Zigbee for existing stable devices**
+
+**Matter Devices** (2):
+- Bedroom TV Light Strip (Govee) - Matter-native, cross-platform
+- Bedroom Motion Sensor P2 (Aqara) - Matter-only device, cannot connect to Hub M2
+
+**Zigbee Devices** (maintained - 16):
+- Hue lights (5) - Mature, stable, native HomeKit
+- Aqara sensors (10: 6 contact, 1 motion P1, 1 switch, 3 NFC assigned) - Already paired, working well
+
+**Rationale**:
+- **Future-proofing**: Matter is the long-term standard for smart home
+- **Stability**: Don't migrate working Zigbee devices unnecessarily
+- **Device constraints**: P2 motion sensor can ONLY connect via Matter
+- **Cross-platform**: Matter enables better interoperability
+
+**Implementation**:
+- Apple TV (Control Room) acts as primary Matter controller
+- Aqara Hub M2 remains Zigbee controller for existing devices
+- New device purchases should prioritize Matter when available
+
+**Reference**: [matter-zigbee-decision.md](00-Inventory/matter-zigbee-decision.md)
+
+---
+
+## 3. Adaptive Lighting Strategy
 
 **Decision**: **HA Adaptive Lighting Component (HA-first approach)**
 
@@ -65,12 +95,12 @@
 
 ---
 
-## 3. Google Assistant - Keep
+## 4. Google Assistant - Keep
 
 **Decision**: **Keep Google Assistant integration**
 
 **Devices**:
-- Nest Mini (1st Gen) - Bathroom speaker (to be added to inventory)
+- Nest Mini (1st Gen) - Bathroom speaker ✅ added to inventory
 - Echo Show 8 (Bedroom)
 - Echo Dot (Office)
 
@@ -89,7 +119,7 @@
 
 ---
 
-## 4. Phase 4 Entity Naming Standardization
+## 5. Phase 4 Entity Naming Standardization
 
 **Decision**: **Proceed with full standardization**
 
@@ -115,7 +145,7 @@
 
 ---
 
-## 5. Network Rebuild Strategy
+## 6. Network Rebuild Strategy
 
 **Decision**: **Complete network rebuild from scratch**
 
@@ -159,10 +189,13 @@
 1. ✅ Update network baseline with CR1000A details
 2. ✅ Add new devices to inventory (Nest Mini, Microwave, Printer)
 3. ✅ Update Phase 4 roadmap status to "Proceed"
-4. → Proceed to Phase 1: Network Segmentation planning
+4. ✅ Verify all Phase 0 documents for accuracy
+5. ✅ Document Matter vs Zigbee priority decision
+6. → **Phase 0 COMPLETE** - Ready to proceed to Phase 1: Network Segmentation planning
 
 ---
 
 ## Version History
 
 - **v1.0.0** (2026-01-18) - Initial decisions documented
+- **v1.1.0** (2026-01-18) - Added Matter vs Zigbee decision, updated device counts, marked Nest Mini as added
