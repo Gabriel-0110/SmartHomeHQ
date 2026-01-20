@@ -1,404 +1,365 @@
 # Phase 1: Network Segmentation — Decision Guide
 
-**Date:** 2026-01-18
-**Your Goals:**
+**Date:** 2026-01-19
+**Status:** ✅ DECISIONS FINALIZED (INTENTIONAL DOUBLE NAT DESIGN)
+
+---
+
+## 🎯 Your Goals
+
 - ✅ Router-level AdBlock (block tracking, ads, malware domains)
 - ✅ Privacy: stop devices from tracking/leaking data
 - ✅ Security: isolate IoT devices from trusted devices
 - ✅ Stability: prevent devices from randomly switching networks
-- ✅ Speed: maintain or improve network performance
+- ✅ **HomeKit stability is TOP PRIORITY**
 
 ---
 
-## 🔴 Critical Decisions You Must Make
+## ✅ FINAL ARCHITECTURE (NON-NEGOTIABLE)
 
-### Decision 1: DNS Strategy (AdBlock + Privacy)
+### Topology Overview
 
-**Question:** How do you want to handle DNS-based ad blocking and privacy?
+```
+ISP → Router #1 (Trusted / Control Plane) → Router #2 WAN (IoT / Edge Network)
+      192.168.1.0/24                         192.168.2.0/24
+```
 
-**Options:**
+### Core Design Principles
 
-#### Option A: Pi-hole on Separate Device (RECOMMENDED)
-- **What:** Install Pi-hole on a Raspberry Pi, spare PC, or Docker container
-- **Pros:**
-  - Best performance and reliability
-  - Full control over blocklists (ads, trackers, telemetry, adult content, etc.)
-  - Detailed query logs (see what each device is accessing)
-  - Can use it as DHCP server (more control)
-  - Can handle 100+ devices easily
-- **Cons:**
-  - Requires additional hardware ($35 for Pi Zero 2 W, or free if using existing PC/Mac mini)
-  - 1-2 hours setup time
-- **Your setup:** Could run Pi-hole in Docker on Mac mini M4 (same host as HA)
+- **Two IDENTICAL Verizon CR1000A routers**
+- **Router #2 REMAINS in ROUTER MODE** (NOT access point mode)
+- **Intentional DOUBLE NAT is REQUIRED**
+- **Two separate subnets** (not one)
+- **Router #1 = Trusted / Control Plane** (192.168.1.0/24)
+- **Router #2 = IoT / Edge Network** (192.168.2.0/24)
 
-#### Option B: Router-Based DNS Filtering (NextDNS or Cloudflare for Families)
-- **What:** Set CR1000A DNS servers to NextDNS or Cloudflare 1.1.1.2
-- **Pros:**
-  - Zero additional hardware
-  - 5 minutes setup
-  - Free tier available (NextDNS: 300k queries/month)
-- **Cons:**
-  - Less control than Pi-hole
-  - Depends on external service (privacy trade-off)
-  - Can't see per-device query logs easily
-  - Verizon router may not support custom DNS (needs testing)
+### Why This Design?
 
-#### Option C: Hybrid (Pi-hole + Upstream Privacy DNS)
-- **What:** Pi-hole on Mac mini → upstream to NextDNS or Cloudflare DoH/DoT
-- **Pros:**
-  - Best of both worlds (local filtering + encrypted DNS)
-  - Maximum privacy and ad blocking
-- **Cons:**
-  - Most complex setup (30-45 minutes)
+**CRITICAL CONSTRAINT**: Verizon CR1000A routers **cannot** do:
+- True VLANs with inter-VLAN firewall rules
+- Per-SSID subnet assignment
+- mDNS reflection across networks
 
-**❓ YOUR CHOICE:**
-[ ] Option A: Pi-hole (Docker on Mac mini)
-[ ] Option B: Router DNS (NextDNS or Cloudflare)
-[ ] Option C: Hybrid (Pi-hole + encrypted upstream)
+**INTENTIONAL DOUBLE NAT RATIONALE**:
 
-**Recommendation:** **Option A** — Run Pi-hole in Docker on your Mac mini M4. You already have the hardware, and it gives you full visibility into what your IoT devices are calling home to.
+✅ **Pros**:
+1. **Two separate subnets**: Trusted (192.168.1.x) and IoT (192.168.2.x) are organizationally separated
+2. **Simplicity**: No mDNS reflection needed — HomeKit devices stay on Router #1
+3. **Works with existing hardware**: No new equipment purchase required
+4. **Architecture enables control**: Dual-homed Mac mini allows HA/Scrypted to reach both subnets
+5. **Reduced exposure**: Separation provides visibility and organizational control
+
+❌ **Acceptable Trade-offs**:
+1. **Double NAT exists**: This is INTENTIONAL, not a bug
+2. **mDNS/Bonjour does NOT traverse NAT**: HomeKit devices behind Router #2 won't work via Router #2's Wi-Fi — this is by design (HomeKit devices stay on Trusted network)
+3. **Mac mini MUST be dual-homed**: HA/Scrypted reach IoT via second interface (not via routing)
+4. **NAT is NOT a security boundary**: It only reduces unsolicited inbound traffic; endpoint firewalls provide enforcement
+
+### Device Placement Rules
+
+| Device Type | Router | Subnet | Reason |
+|-------------|--------|--------|--------|
+| Home Assistant (VM) | Router #1 | 192.168.1.x | Central hub on Trusted network |
+| Scrypted (Mac mini host) | Router #1 | 192.168.1.x | Camera hub on Trusted network |
+| Mac mini M4 (host) | DUAL-HOMED | 192.168.1.x + 192.168.2.x | Interface on BOTH routers for HA/Scrypted IoT access |
+| HomeKit hubs (Apple TV, iPad) | Router #1 | 192.168.1.x | Must communicate with HA Bridge |
+| Phones, PCs, tablets | Router #1 | 192.168.1.x | Trusted user devices |
+| **All IoT devices** | Router #2 | 192.168.2.x | Separated on IoT subnet |
+| **All cameras** | Router #2 | 192.168.2.x | Separated on IoT subnet |
+| Hubs (Hue, Aqara) | Router #2 | 192.168.2.x | Separated on IoT subnet |
+
+**CRITICAL**: Mac mini MUST be dual-homed (one interface on each router) so that Home Assistant and Scrypted can reach IoT devices on 192.168.2.x.
 
 ---
 
-### Decision 2: Network Segmentation Architecture
+## 🔴 FINAL DECISIONS (Selected)
 
-**Question:** How many logical networks do you want?
+### Decision 1: Network Strategy
+**✅ SELECTED: Intentional Double NAT (Two Routers, Two Subnets)**
 
-**Current State:** You have 3 SSIDs but no firewall rules (devices can still talk to each other).
-
-**Options:**
-
-#### Option A: 3 Networks (Simple, RECOMMENDED for CR1000A)
+**Configuration:**
 ```
-1. Trusted (EnterAtYourOwnRisk)
-   - Phones, PCs, iPad, Apple TV, Mac mini
-   - Can access everything
+Router #1 (Trusted / Control Plane):
+- WAN: ISP modem
+- LAN subnet: 192.168.1.0/24
+- Devices: HA, Scrypted, Mac mini, phones, PCs, Apple TVs, iPad
+- SSIDs: Primary (trusted devices only)
 
-2. IoT (ByteMe)
-   - Plugs, lights, Hue Bridge, Aqara Hub, Echo devices
-   - Can initiate to internet
-   - Cannot initiate to Trusted
-   - HA can reach IoT
-
-3. Cameras (NEW or rename HotNeighborsCanConnect)
-   - 4x Tapo cameras
-   - Can reach Scrypted only
-   - Cannot reach internet (local-only)
-   - HA can reach cameras
+Router #2 (IoT / Edge Network):
+- WAN: Router #1 LAN port (intentional cascade)
+- LAN subnet: 192.168.2.0/24
+- Devices: All IoT, all cameras, Hue, Aqara
+- SSIDs: IoT (ByteMe), Cameras (dedicated)
 ```
 
-#### Option B: 4 Networks (Advanced, requires VLAN support)
-```
-1. Trusted (as above)
-2. IoT (as above)
-3. Cameras (as above)
-4. Guest (isolated, internet-only)
-```
-
-#### Option C: 2 Networks (Minimal, not recommended for your goals)
-```
-1. Trusted (everything you trust)
-2. Untrusted (IoT + cameras + guests)
-```
-
-**Firewall Rules (for Option A):**
-```
-✅ Trusted → IoT (allowed, for control)
-✅ Trusted → Cameras (allowed, for viewing)
-✅ IoT → Internet (allowed, for updates/cloud)
-✅ Cameras → Scrypted only (local RTSP)
-❌ IoT → Trusted (blocked)
-❌ Cameras → Internet (blocked, privacy)
-❌ Cameras → Trusted (blocked, except Scrypted)
-```
-
-**❓ YOUR CHOICE:**
-[ ] Option A: 3 Networks (Trusted, IoT, Cameras)
-[ ] Option B: 4 Networks (add dedicated Guest)
-[ ] Option C: 2 Networks (simpler but less secure)
-
-**Recommendation:** **Option A** — 3 networks is the sweet spot for your setup. Guest network can be added later if needed.
+**Why This Decision:**
+- **Subnet separation**: Router #2 provides a separate 192.168.2.x subnet for IoT
+- **Mac mini dual-homing**: HA/Scrypted reach IoT via second interface (not via routing)
+- **No mDNS needed**: HomeKit devices stay on Router #1 (same subnet as HA Bridge)
+- **Works with CR1000A limitations**: No VLAN support required
+- **NAT is NOT a firewall**: Endpoint enforcement is primary isolation control
 
 ---
 
-### Decision 3: Prevent Devices from Switching Networks
+### Decision 2: DNS Strategy
+**✅ SELECTED: Per-Device DNS for Trusted, Router DNS for IoT**
 
-**Problem:** Your devices are randomly switching between SSIDs.
+**Configuration:**
+- **Router #1 (Trusted)**: Configure per-device DNS (AdGuard DNS IPs) on critical devices:
+  - iPhones/iPads: Wi-Fi settings → Configure DNS → Manual
+  - Apple TVs: Network → Configure DNS → Manual
+  - macOS (Mac mini): System Settings → Network → DNS
+  - Windows PCs: Network adapter → DNS settings
+- **Router #2 (IoT)**: Let router assign default DNS (or set manually if UI allows)
+  - IoT devices don't need ad blocking (less maintenance)
+  - Cameras are internet-blocked anyway
 
-**Root Cause:** Likely due to:
-- Same SSID name broadcast on multiple bands (2.4/5/6 GHz)
-- Band steering enabled (router auto-moves devices)
-- Devices roaming to "stronger" signal
+**Optional**: Run AdGuard Home locally (HA add-on) and point devices to 192.168.1.21 (HA IP).
 
-**Solutions:**
-
-#### Fix 1: Disable Band Steering
-- **Action:** In CR1000A settings, turn OFF "Band Steering" or "Smart Connect"
-- **Result:** Devices stay on the SSID you assign them to
-
-#### Fix 2: Use Different SSID Names per Band
-- **Current:** "EnterAtYourOwnRisk" (2.4/5/6 GHz all same name)
-- **Change to:**
-  - `Trusted` (5/6 GHz only, for fast devices)
-  - `Trusted-Legacy` (2.4 GHz only, for slow IoT devices that need it)
-  - `IoT` (2.4 GHz only)
-  - `Cameras` (2.4 GHz only)
-
-#### Fix 3: Set Static SSID per Device
-- **Action:** Manually configure each device to connect to specific SSID
-- **How:** Forget all networks on device, reconnect to only the correct one
-
-#### Fix 4: Use MAC Address Filtering (Optional, Advanced)
-- **Action:** Bind specific devices to specific SSIDs via MAC filtering
-- **Pros:** Devices can't "roam" even if they try
-- **Cons:** Maintenance overhead (need to update router config for every new device)
-
-**❓ YOUR CHOICES:**
-[ ] Fix 1: Disable Band Steering (REQUIRED)
-[ ] Fix 2: Rename SSIDs per band (RECOMMENDED)
-[ ] Fix 3: Manually set SSID on each device (REQUIRED)
-[ ] Fix 4: MAC filtering (OPTIONAL, for extra control)
-
-**Recommendation:** Do Fix 1 + Fix 2 + Fix 3. Skip Fix 4 unless you want maximum control.
+**Why This Decision:**
+- CR1000A does not support custom LAN DHCP DNS push
+- Per-device DNS ensures trusted devices use AdGuard
+- IoT devices are isolated and don't need strict DNS control
 
 ---
 
-### Decision 4: HomeKit mDNS/Bonjour Strategy
+### Decision 3: Wi-Fi Stability
+**✅ SELECTED: Disable Band Steering/SON + Band Assignment per SSID**
 
-**Problem:** HomeKit uses mDNS/Bonjour for discovery. If you isolate networks, HomeKit may break.
+**Configuration:**
+- **Router #1 (Trusted)**:
+  - Disable Band Steering/SON
+  - Primary SSID: Enable 5 GHz + 6 GHz (disable 2.4 GHz if possible)
+  - Security: WPA2/WPA3
+- **Router #2 (IoT)**:
+  - Disable Band Steering/SON
+  - IoT SSID (ByteMe): 2.4 GHz ONLY
+  - Cameras SSID: 2.4 GHz ONLY
+  - Security: WPA2
 
-**Question:** How do you want to preserve HomeKit functionality across networks?
+**Why This Decision:**
+- Prevents devices from randomly switching bands/SSIDs
+- 2.4 GHz for IoT/cameras (better range, wall penetration)
+- 5/6 GHz for trusted devices (faster speeds, less congestion)
 
-**Options:**
+---
 
-#### Option A: Allow mDNS Reflection on Router
-- **What:** Enable "mDNS Repeater" or "Avahi Reflector" on CR1000A
-- **Pros:** HomeKit works seamlessly across all networks
-- **Cons:** CR1000A may not support this (need to check)
+### Decision 4: HomeKit Discovery Strategy
+**✅ SELECTED: Home Assistant HomeKit Bridge Owns Discovery (Trusted Network Only)**
 
-#### Option B: Let Home Assistant Bridge Everything
-- **What:** All devices go through HA → HomeKit Bridge → Your devices
-- **Pros:** HA is on Trusted network, can reach IoT/Cameras, no mDNS issues
-- **Cons:** Slightly slower response time (extra hop)
+**Configuration:**
+- **HA HomeKit Bridge**: Primary bridge for all non-camera devices
+  - HA on Router #1 (Trusted network)
+  - Exposes selected IoT entities from Router #2 to HomeKit
+  - HA reaches IoT devices via Mac mini's IoT interface (dual-homed)
+- **Scrypted**: Camera hub (HKSV where possible)
+  - Scrypted on Router #1 (Trusted network)
+  - Pulls camera streams from Router #2 via Mac mini's IoT interface
+- **Homebridge**: Compatibility layer only (when absolutely needed)
+  - Avoid double-bridging same devices
 
-#### Option C: Selective mDNS Rules
-- **What:** Allow mDNS (UDP 5353) from IoT → Trusted (one-way)
-- **Pros:** HomeKit works, but IoT still can't initiate TCP connections
-- **Cons:** Requires advanced firewall rules (CR1000A may not support)
-
-#### Option D: Keep HomeKit Hubs on IoT Network
-- **What:** Move Apple TV, Aqara Hub, Hue Bridge to IoT network
-- **Pros:** All HomeKit devices are on same network (no mDNS issues)
-- **Cons:** Your Apple TV is now on less-trusted network (not ideal)
-
-**❓ YOUR CHOICE:**
-[ ] Option A: mDNS reflection (check if CR1000A supports it)
-[ ] Option B: HomeKit Bridge via HA (SAFEST, RECOMMENDED)
-[ ] Option C: Selective mDNS firewall rules
-[ ] Option D: Move hubs to IoT network (not recommended)
-
-**Recommendation:** **Option B** — Let HA handle all HomeKit exposure. This is already your strategy per CLAUDE.md.
+**Why This Decision:**
+- Mac mini dual-homing enables HA/Scrypted to reach all IoT devices
+- HomeKit hubs (Apple TVs, iPad) are on same subnet as HA (192.168.1.x) — mDNS works
+- No mDNS reflection needed (HomeKit devices not behind Router #2)
+- Matches CLAUDE.md north star: HA is central hub
 
 ---
 
 ### Decision 5: Camera Isolation Level
+**✅ SELECTED: Camera Separation (Router #2 Subnet + No Internet)**
 
-**Question:** How isolated should your cameras be?
+**Configuration:**
+- Cameras on Router #2 (IoT network) subnet 192.168.2.x
+- Dedicated Cameras SSID (2.4 GHz only)
+- Block internet access using Router #2 Access Control / Parental Controls
+- Cameras can ONLY:
+  - Reach Scrypted via Mac mini's IoT interface (192.168.2.10)
+  - Cannot reach internet (blocked by Access Control)
 
-**Your 4 Tapo C110 cameras currently on IoT network (ByteMe).
+**Why This Decision:**
+- **Maximum privacy**: Cameras can't phone home to Tapo cloud
+- **Local access only**: Scrypted pulls streams via Mac mini's dual-homed IoT interface
+- **No NAT dependency**: Mac mini reaches cameras directly on same subnet (192.168.2.x)
+
+**Trade-offs:**
+- Can't use Tapo mobile app for camera config (use Scrypted UI instead)
+- Can't auto-update firmware (must allow temporarily or manually update)
+
+---
+
+### Decision 6: IP Address Management
+**✅ SELECTED: Dual Subnet with Organized IP Ranges**
+
+**Configuration:**
+
+**Router #1 (Trusted) - 192.168.1.0/24:**
+```
+192.168.1.1           Router #1 gateway
+192.168.1.2-19        Reserved for network infrastructure
+192.168.1.20-49       Servers & Core Services
+  .20                 Mac mini M4 (host for HA + Scrypted)
+  .21                 Home Assistant (VM)
+  .22-49              Reserved for future services
+192.168.1.50-99       Trusted Static Devices
+  .50                 Apple TV 4K (Control Room hub)
+  .51                 Apple TV (Bedroom)
+  .52                 iPad 5th Gen (wall panel)
+  .53-99              Reserved for PCs/laptops
+192.168.1.100-254     DHCP Dynamic Pool (phones, tablets, PCs)
+```
+
+**Router #2 (IoT) - 192.168.2.0/24:**
+```
+192.168.2.1           Router #2 gateway (WAN from Router #1)
+192.168.2.2-49        Reserved for infrastructure
+192.168.2.50-149      IoT Devices (DHCP or static)
+  .50                 Philips Hue Bridge
+  .51                 Aqara Hub M2
+  .52                 Echo Show 8
+  .53                 Echo Dot
+  .54                 Nest Mini
+  .55                 HP Printer
+  .56                 Toshiba Microwave
+  .57-149             Reserved for future IoT
+192.168.2.150-199     Cameras (Static Reservations REQUIRED)
+  .150                Kitchen Camera
+  .151                Hallway Camera
+  .152                Entrance Camera
+  .153                Office Camera
+  .154-199            Reserved for future cameras
+192.168.2.200-254     DHCP Dynamic Pool (IoT devices if needed)
+```
+
+**Why This Decision:**
+- **Clean separation**: Trusted vs IoT subnets
+- **Organized ranges**: Easy to identify device types by IP
+- **Static for critical**: HA, Scrypted, cameras get fixed IPs
+- **DHCP for flexibility**: Consumer devices auto-configure
+
+---
+
+### Decision 7: Router Security Hardening
+**✅ SELECTED: Full Hardening (Both Routers)**
+
+**Configuration:**
+- **Both routers**:
+  - Disable WPS (Wi-Fi Protected Setup)
+  - Disable UPnP (Universal Plug and Play)
+  - Disable Band Steering/SON
+  - No port forwards (except if explicitly justified)
+  - DMZ off
+  - IPv6: Review and set intentionally (disable if not using)
+  - Remote admin: Disabled
+- **Router #2 specific**:
+  - Block camera internet access via Access Control (by MAC address)
+  - Firewall: Default deny all inbound (from WAN/internet)
+
+**Why This Decision:**
+- WPS is a known security vulnerability
+- UPnP allows devices to open ports automatically (security risk)
+- Port forwards create inbound exposure
+- Best practice: deny by default
+
+---
+
+## 📋 Implementation Path
+
+### Phase 1A: Network Foundation + IP Reorganization
+**Target:** Configure dual-router topology, migrate devices, organize IPs
+
+**Steps:**
+1. Pre-change snapshots (screenshots of both routers)
+2. Configure Router #2 WAN to connect to Router #1 LAN (already done, verify)
+3. Configure Router #2 LAN subnet to 192.168.2.0/24 (change from 192.168.1.x or 192.168.0.x)
+4. Disable Band Steering on both routers
+5. Configure SSID band assignments (2.4 vs 5/6 GHz)
+6. Disable WPS, UPnP on both routers
+7. Create static reservations for HA, Scrypted, cameras, hubs
+8. Migrate devices to correct routers/SSIDs
+9. Block camera internet access (Access Control on Router #2)
+10. Validation tests
+
+**Estimated time:** 2-3 hours
+
+**See:** [phase1a-implementation-guide.md](phase1a-implementation-guide.md)
+
+---
+
+### Phase 1B: Endpoint Hardening + Access Control Validation
+**Target:** Protect trusted endpoints, configure endpoint firewalls
+
+**Steps:**
+1. Home Assistant hardening (MFA, least privilege, backup)
+2. macOS Firewall (Mac mini host)
+3. Windows Firewall (if applicable)
+4. Router security review (DMZ off, port forwards empty, IPv6 intentional)
+5. Verify Mac mini dual-homing (can reach both 192.168.1.x and 192.168.2.x)
+6. Test HA/Scrypted can reach IoT devices
+7. Test camera streams work in Scrypted
+
+**Estimated time:** 1-1.5 hours
+
+**See:** [phase1b-implementation-guide.md](phase1b-implementation-guide.md)
+
+---
+
+### Phase 2: Hardware Upgrade (Future, Optional)
+**Target:** Replace CR1000A with true VLAN-capable router/firewall
 
 **Options:**
+- Firewalla Gold / Gold Plus (~$400-600)
+- UniFi Dream Machine / UDM Pro (~$200-500)
+- OPNsense on dedicated hardware (~$200-400)
+- pfSense on dedicated hardware (~$200-400)
 
-#### Option A: Full Isolation (RECOMMENDED)
-- **Config:**
-  - Cameras on dedicated SSID ("Cameras" network)
-  - Firewall: Block cameras from internet entirely
-  - Firewall: Allow cameras → Scrypted only (192.168.1.224)
-  - Scrypted pulls RTSP streams locally
-- **Pros:**
-  - Maximum privacy (cameras can't phone home to Tapo cloud)
-  - Maximum security (cameras can't be hijacked to attack other devices)
-- **Cons:**
-  - Can't use Tapo mobile app to configure cameras (must use web UI via Scrypted IP access)
-  - Can't receive camera firmware updates (must do manually via SD card or allow temporarily)
+**Phase 2 would add:**
+- True VLAN per SSID (not just double NAT)
+- Layer 3 firewall rules (granular control)
+- mDNS reflection (HomeKit across VLANs)
+- Network-wide DNS enforcement
+- Better logging and visibility
 
-#### Option B: Internet Access for Updates Only
-- **Config:**
-  - Cameras on dedicated SSID
-  - Firewall: Allow cameras → Tapo cloud for updates
-  - Firewall: Block cameras → Trusted network
-- **Pros:**
-  - Cameras can update automatically
-  - Still protected from attacking your trusted devices
-- **Cons:**
-  - Cameras can still phone home (privacy leak)
-
-#### Option C: Keep Cameras on IoT Network
-- **Config:**
-  - Cameras stay on ByteMe (same as other IoT devices)
-  - Share firewall rules with smart plugs, lights, etc.
-- **Pros:**
-  - Simplest config (no extra network)
-- **Cons:**
-  - Cameras are same threat level as light bulbs (not ideal for security cameras)
-
-**❓ YOUR CHOICE:**
-[ ] Option A: Full isolation, no internet (RECOMMENDED)
-[ ] Option B: Allow Tapo cloud for updates
-[ ] Option C: Keep on IoT network with other devices
-
-**Recommendation:** **Option A** — Cameras should be your most locked-down devices. Use Scrypted for all camera access, block Tapo cloud entirely.
+**Status:** Not required for Phase 1; document as future option if double NAT proves insufficient.
 
 ---
 
-### Decision 6: Guest Network Strategy
+## 🚨 Critical Constraints Summary
 
-**Question:** What do you want to do with "HotNeighborsCanConnect" SSID?
-
-**Options:**
-
-#### Option A: Repurpose as Cameras Network (RECOMMENDED)
-- **Action:** Rename "HotNeighborsCanConnect" → "Cameras"
-- **Why:** You have 3 SSIDs, need Trusted/IoT/Cameras
-
-#### Option B: Keep as Guest, Create 4th SSID for Cameras
-- **Action:** Keep guest network, add new "Cameras" SSID
-- **Why:** You want a true guest network for visitors
-- **Limitation:** CR1000A may only support 3 SSIDs (need to verify)
-
-#### Option C: Disable Guest Network Entirely
-- **Action:** Turn off "HotNeighborsCanConnect"
-- **Why:** Don't need guest network right now
-
-**❓ YOUR CHOICE:**
-[ ] Option A: Repurpose Guest → Cameras (RECOMMENDED)
-[ ] Option B: Keep Guest, add 4th SSID
-[ ] Option C: Disable Guest network
-
-**Recommendation:** **Option A** — You need camera isolation more than a guest network right now. Can always re-add guest later.
+| Feature | CR1000A Support | Phase 1 Approach | Phase 2 Path |
+|---------|-----------------|------------------|--------------|
+| Dual subnet separation | ✅ YES (via double NAT) | Router #2 in router mode | New router with VLANs |
+| Mac mini dual-homing | ✅ YES | Second interface on Router #2 | Same |
+| HA/Scrypted IoT access | ✅ YES | Via Mac mini IoT interface | Same |
+| Endpoint isolation | ✅ YES (host firewalls) | macOS/Windows firewalls | Layer 3 firewall rules |
+| mDNS across subnets | ❌ NO | Not needed (HomeKit on Router #1) | mDNS reflector |
+| LAN DHCP DNS push | ❌ NO | Per-device DNS for trusted | Same |
+| Camera internet block | ✅ YES | Access Control (Router #2) | Same |
+| Static reservations | ✅ YES | Use for HA, cameras, hubs | Same |
+| Band control per SSID | ✅ YES | 2.4 only for IoT/Cameras | Same |
+| WPS disable | ✅ YES | Disable in Phase 1A | N/A |
+| UPnP disable | ✅ YES | Disable in Phase 1A | N/A |
 
 ---
 
-### Decision 7: IP Address Management
+## ⚡ Quick Start
 
-**Question:** How do you want to manage IP addresses?
+**If you accept the FINAL ARCHITECTURE (intentional double NAT, two subnets):**
 
-**Options:**
+Reply: **"Proceed with Phase 1A"**
 
-#### Option A: Subnet per Network (Requires VLAN Support)
-```
-Trusted:  192.168.1.0/24  (current)
-IoT:      192.168.2.0/24  (new)
-Cameras:  192.168.3.0/24  (new)
-```
-- **Pros:** Cleanest segmentation, easy to write firewall rules
-- **Cons:** Requires VLAN support (CR1000A may not have this)
+I will guide you through:
+1. Pre-change screenshots (rollback capability)
+2. Router configuration changes (both routers)
+3. Device migration to correct routers/SSIDs/IPs
+4. Validation testing (verify isolation works)
+5. Troubleshooting if needed
 
-#### Option B: Single Subnet with Firewall Rules (RECOMMENDED for CR1000A)
-```
-All devices: 192.168.1.0/24
-- Trusted: .1-.99
-- IoT:     .100-.199
-- Cameras: .200-.249
-- HA/Hubs: .240-.254
-```
-- **Pros:** Works with basic router (no VLAN needed)
-- **Cons:** Firewall rules must use IP ranges instead of subnets
+**Estimated time:** 2-3 hours (includes testing)
 
-**Current Critical IPs to Preserve:**
-```
-192.168.1.242 → Home Assistant VM (keep as-is)
-192.168.1.224 → Scrypted (verify this is active)
-192.168.1.169 → Hue Bridge
-192.168.1.165 → Aqara Hub M2
-192.168.1.210 → Kitchen Camera
-192.168.1.236 → Hallway Camera
-192.168.1.155 → Entrance Camera
-192.168.1.204 → Office Camera
-```
-
-**❓ YOUR CHOICE:**
-[ ] Option A: Separate subnets (192.168.1.x, 192.168.2.x, 192.168.3.x)
-[ ] Option B: Single subnet with IP ranges (RECOMMENDED)
-
-**Recommendation:** **Option B** — Start with IP ranges on single subnet. If CR1000A supports VLANs, you can migrate to Option A later.
+**Rollback plan:** Included in Phase 1A guide (can revert if critical issues occur)
 
 ---
 
-### Decision 8: DHCP vs Static IPs
-
-**Question:** How should devices get IP addresses?
-
-**Options:**
-
-#### Option A: Static IPs for Critical Devices Only (RECOMMENDED)
-- **Static (never change):**
-  - Home Assistant: 192.168.1.242
-  - Scrypted: 192.168.1.224
-  - Hue Bridge: 192.168.1.169
-  - Aqara Hub M2: 192.168.1.165
-  - All 4 cameras: .210, .236, .155, .204
-- **DHCP (dynamic):**
-  - Phones, tablets, PCs, smart plugs, lights
-
-#### Option B: Static IPs for Everything
-- **What:** Assign fixed IP to every device via DHCP reservation
-- **Pros:** Predictable IP addressing, easier firewall rules
-- **Cons:** High maintenance (38+ devices)
-
-#### Option C: DHCP for Everything
-- **What:** Let router assign IPs dynamically
-- **Pros:** Zero maintenance
-- **Cons:** Device IPs can change (breaks firewall rules, HA configs)
-
-**❓ YOUR CHOICE:**
-[ ] Option A: Static for critical devices, DHCP for rest (RECOMMENDED)
-[ ] Option B: Static for all devices
-[ ] Option C: DHCP for everything
-
-**Recommendation:** **Option A** — Static for HA, Scrypted, hubs, cameras. DHCP for everything else.
-
----
-
-## 📋 Your Next Steps
-
-### Before we proceed with Phase 1 implementation:
-
-1. **Complete the Pre-Flight Checklist:**
-   - See [phase1-preflight-checklist.md](phase1-preflight-checklist.md)
-   - Especially: Verify CR1000A access, backup router config
-
-2. **Make the 8 decisions above:**
-   - Check the boxes for your choices
-   - If unsure, I'll use the RECOMMENDED options
-
-3. **Research CR1000A Capabilities:**
-   - Does it support VLAN tagging?
-   - Does it support mDNS repeater/reflection?
-   - Does it support per-SSID firewall rules?
-   - Can you set custom DNS servers?
-   - (I can help you find this info via Verizon support docs or app)
-
-4. **Tell me:**
-   - "I've made my decisions" (share which options you picked)
-   - OR "Use all RECOMMENDED options" (I'll proceed with safest defaults)
-   - OR "I need help deciding X" (we'll discuss)
-
----
-
-## ⚡ Quick Start (If You Trust My Recommendations)
-
-If you want to proceed with my recommended config:
-
-- **DNS:** Pi-hole in Docker on Mac mini
-- **Networks:** 3 networks (Trusted, IoT, Cameras)
-- **SSIDs:** Rename Guest → Cameras, disable band steering
-- **HomeKit:** All via HA HomeKit Bridge (already your strategy)
-- **Cameras:** Full isolation, no internet, Scrypted-only access
-- **IPs:** Single subnet with IP ranges, static for critical devices
-
-**To start Phase 1 with this config, reply:** "Go with recommended setup"
-
----
-
-**Last Updated:** 2026-01-18
+**Last Updated:** 2026-01-19
+**Architecture:** DUAL-ROUTER DESIGN (two routers, two subnets, Mac mini dual-homed for IoT access)

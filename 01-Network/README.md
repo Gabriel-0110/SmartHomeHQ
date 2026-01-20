@@ -2,34 +2,45 @@
 
 ## Overview
 
-This folder contains network infrastructure documentation including topology, VLANs, firewall rules, and IoT network segregation.
+This folder contains network infrastructure documentation for the SmartHomeHQ dual-router architecture.
+
+## Architecture Summary
+
+- **Dual-router design**: Router #1 (Trusted) + Router #2 (IoT) in intentional double NAT
+- **Two subnets**: 192.168.1.0/24 (Trusted) and 192.168.2.0/24 (IoT)
+- **Mac mini is DUAL-HOMED**: One interface on each router for HA/Scrypted IoT access
+- **NAT is NOT a security boundary**: Endpoint firewalls provide enforcement
+- **No VLANs**: CR1000A routers do not support VLANs
 
 ## Contents
 
-- **network-topology.md**: Network diagram and overall architecture
-- **vlan-configuration.md**: VLAN setup and device assignments
-- **firewall-rules.md**: Firewall rules and access control lists
-- **dhcp-reservations.md**: Static IP assignments and DHCP reservations
-- **dns-configuration.md**: Local DNS setup and custom domains
-- **vpn-setup.md**: VPN configuration for remote access
-- **wifi-configuration.md**: WiFi networks and guest access
+### Reference of Truth (Finalized)
+- **PHASE1-START-HERE.md**: Entry point for Phase 1 implementation
+- **phase1a-implementation-guide.md**: Network foundation and device migration
+- **phase1b-implementation-guide.md**: Endpoint and platform hardening
 
-## Network Architecture
+### Supporting Documentation
+- **current-network.md**: Current network state and target topology
+- **phase1-decision-guide.md**: Architecture decisions and rationale
+- **phase1-preflight-checklist.md**: Pre-implementation checklist
+- **network-template.md**: Template for documenting network segments
 
-### Network Segments
+### Router Configuration
+- **router/**: Router configuration backups and audit results
 
-- **Main Network**: Trusted devices (computers, phones, tablets)
-- **IoT Network**: Smart home devices (isolated VLAN)
-- **Cameras**: Security cameras (dedicated VLAN)
-- **Guest Network**: Visitor access (internet only)
-- **Management**: Infrastructure management (switches, APs, servers)
+## Network Segments
+
+| Segment | Subnet | Purpose | Devices |
+|---------|--------|---------|--------|
+| Trusted | 192.168.1.0/24 | Control plane | Mac mini, HA, HomeKit hubs, phones, PCs |
+| IoT | 192.168.2.0/24 | IoT and cameras | Hue, Aqara, Echo, cameras |
 
 ## Security Principles
 
-- **Segregation**: IoT devices isolated from main network
-- **Least Privilege**: Devices only access required services
-- **No Internet**: Critical devices operate locally when possible
-- **Monitoring**: Network traffic monitoring and alerts
+- **Dual-homing**: Mac mini has interfaces on both subnets
+- **Endpoint firewalls**: Primary enforcement (macOS/Windows firewalls)
+- **Camera separation**: Internet blocked via Access Control
+- **No magic isolation**: NAT reduces exposure but does not enforce security
 
 ## Documentation Standards
 
@@ -37,11 +48,3 @@ This folder contains network infrastructure documentation including topology, VL
 - Document all firewall rules with justification
 - Keep IP address assignments updated
 - Include device MAC addresses for critical systems
-- Document port forwarding and NAT rules
-
-## Tools and Resources
-
-- Network diagramming tools
-- IP address management (IPAM)
-- Network monitoring tools
-- Firewall management interface

@@ -35,6 +35,13 @@ Thumbs.db
 backup/
 Backup*/
 
+# Network configuration screenshots (may contain sensitive data)
+01-Network/router/screenshots/
+01-Network/screenshots/
+
+# Integration screenshots (may contain sensitive data)
+02-HomeAssistant/screenshots/
+
 # Log files
 *.log
 logs/

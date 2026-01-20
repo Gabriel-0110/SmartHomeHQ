@@ -3,7 +3,7 @@
 ## Network Segment
 
 - **Network Name**: 
-- **VLAN ID**: 
+- **Router**: (Router #1 Trusted / Router #2 IoT)
 - **Subnet**: 
 - **Gateway**: 
 
