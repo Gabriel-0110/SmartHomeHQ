@@ -76,27 +76,27 @@ Implement network segmentation with 3 logical zones: Trusted, IoT, and Cameras.
 
 ---
 
-## Phase 1.5: Home Assistant VM Reliability & Optimization
+## Phase 2: Home Assistant VM Reliability & Optimization
 
 ### Goal
 Validate and optimize Home Assistant VM (UTM) for reliable, performant operation.
 
-**Status:** 🔜 **NEXT** (After Phase 1 completion)
+**Status:** ✅ **COMPLETED** (2026-01-22)
 
 ### Pre-Requisites
 - [x] Phase 1 (Network Segmentation) complete
-- [ ] UTM app access on Mac mini
-- [ ] HA admin credentials (with MFA)
+- [x] UTM app access on Mac mini
+- [x] HA admin credentials (with MFA)
 
 ### Tasks
-- [ ] Document current VM configuration (CPU, RAM, disk, network mode)
-- [ ] Establish performance baseline (HomeKit response times, HA UI load times)
-- [ ] Optimize VM resources if needed (CPU cores, RAM allocation)
-- [ ] Validate mDNS/discovery functionality post-Phase 1
-- [ ] Verify all integrations healthy and reachable
-- [ ] Create backup & snapshot strategy (automatic weekly backups)
-- [ ] Run 72-hour stability test
-- [ ] Update ha-baseline.md with discovered configuration
+- [x] Document current VM configuration (CPU, RAM, disk, network mode)
+- [x] Establish performance baseline (HomeKit response times, HA UI load times)
+- [x] Optimize VM resources if needed (CPU cores, RAM allocation)
+- [x] Validate mDNS/discovery functionality post-Phase 1
+- [x] Verify all integrations healthy and reachable
+- [x] Create backup & snapshot strategy (automatic weekly backups)
+- [x] Network reliability validation (host reboot, Router #1/Router #2 reboot tests - all PASS)
+- [x] Update ha-baseline.md with discovered configuration
 
 ### Inputs
 - [02-HomeAssistant/ha-baseline.md](02-HomeAssistant/ha-baseline.md) - Baseline to update
@@ -131,7 +131,50 @@ Validate and optimize Home Assistant VM (UTM) for reliable, performant operation
 
 ---
 
-## Phase 2: HomeKit Bridge Cleanup
+## Phase 2.5: Home Model Governance & Normalization
+
+### Goal
+Define canonical rules for naming, areas, zones, labels, and exposure within the smart home model.
+
+**Status:** ✅ **COMPLETED** (2026-01-22)
+
+### Scope
+This phase defines standards only. No devices are onboarded, renamed, or reconfigured.
+
+### Tasks
+- [x] Define naming conventions (devices, entities, automations, scripts)
+- [x] Define Areas vs Zones model
+- [x] Define Labels / tags taxonomy
+- [x] Define HomeKit exposure policy
+- [x] Define Dashboard philosophy (rules only)
+
+### Outputs
+- [phase2.5-governance-normalization.md](02-HomeAssistant/phase2.5-governance-normalization.md) - **Governance standards document**
+
+### Key Achievements
+- Naming schema established: human-readable, scalable, predictable
+- Areas (physical spaces) vs Zones (logical groupings) defined
+- Label categories defined: Function, Criticality, Ownership
+- HomeKit exposure policy documented
+- Dashboard philosophy established (Operational vs Daily-use)
+
+### Implementation Status
+- ⏸️ **Execution deferred:** Standards defined but NOT applied
+- No device renaming performed
+- No labels, areas, or zones created in HA
+- No dashboards built
+- Application will occur in a future HA execution phase (after Phase 4)
+
+### Risk Level
+**None** - Documentation only, no system changes
+
+### Expected Outcome
+- Governance rules documented and frozen
+- Phase 3+ can apply rules without reinterpretation
+
+---
+
+## Phase 2 (Roadmap): HomeKit Bridge Cleanup
 
 ### Goal
 Remove Hue devices from HA HomeKit Bridge and use native Hue Bridge HomeKit only.
@@ -159,10 +202,12 @@ Remove Hue devices from HA HomeKit Bridge and use native Hue Bridge HomeKit only
 
 ---
 
-## Phase 3: Consolidate HomeKit Bridges
+## Phase 3 (Future - Roadmap): Consolidate HomeKit Bridges
 
 ### Goal
 Merge multiple HA HomeKit Bridge instances into single, filtered bridge.
+
+**Status:** 📋 **PLANNED** (Future phase)
 
 ### Tasks
 - [ ] Document all current HomeKit Bridge instances
@@ -189,17 +234,51 @@ Merge multiple HA HomeKit Bridge instances into single, filtered bridge.
 
 ---
 
-## Phase 4: Areas, Zones, Labels & Naming
+## Phase 4: Homebridge – Compatibility Layer
 
 ### Goal
-Standardize device naming and organization across HA and HomeKit.
+Configure Homebridge for niche integrations not supported by HA or Scrypted.
 
-### Status
+**Status:** 📋 **PLANNED** (Future phase)
+
+### Scope
+- Homebridge setup and configuration
+- Plugin installation for unsupported devices
+- HomeKit exposure via Homebridge (niche devices only)
+- Integration with HA for automation
+
+### Key Principle
+- Homebridge is a compatibility layer ONLY
+- Never double-bridge devices (one source of truth per device)
+- Prefer native HA or Scrypted integrations when available
+
+### Risk Level
+**Low** - Additive only, no changes to existing devices
+
+---
+
+## Phase 4+ (Future): HA Naming, Labels, Areas & Dashboards
+
+### Goal
+Apply Phase 2.5 governance standards to Home Assistant configuration.
+
+**Status:** 📋 **PLANNED** (After Phase 4)
+
+**Note:** This phase will implement the naming conventions, labels, areas, zones, and dashboards defined in Phase 2.5. It is intentionally deferred until after Homebridge setup to ensure all device sources are finalized.
+
+### Scope
+- Apply naming conventions to all HA entities
+- Create Areas (physical spaces) and Zones (logical groupings)
+- Apply labels (Function, Criticality, Ownership)
+- Build dashboards (Operational + Daily-use)
+- Update HomeKit exposure based on governance policy
+
+### Status (Architecture Decision)
 **PROCEED** - User decision: Building from scratch, breaking automations is acceptable for long-term organization.
 
 ### Tasks
 - [ ] Create [areas-zones-labels.md](00-Inventory/areas-zones-labels.md)
-- [ ] Define naming convention (consistent with CLAUDE.md guidelines)
+- [ ] Apply naming convention from Phase 2.5 (consistent with CLAUDE.md guidelines)
 - [ ] Create safe rename plan that tracks automation dependencies
 - [ ] Update entity IDs following: `<domain>.<room>_<function>[_<descriptor>]`
 - [ ] Update friendly names for HomeKit: `<Room> <Category> <Descriptor>`
@@ -224,6 +303,8 @@ Standardize device naming and organization across HA and HomeKit.
 ---
 
 ## Phase 5: Scrypted Camera Verification
+
+**Status:** ✅ **MERGED INTO PHASE 3** (Completed as part of Phase 3 Scrypted & Camera Pipeline)
 
 ### Goal
 Verify all 4 Tapo C110 cameras properly configured with HKSV.
@@ -344,28 +425,29 @@ Implement ongoing monitoring and security best practices.
 |-------|--------|----------|----------------|------------|
 | Phase 0: Inventory | ✅ Complete | - | - | - |
 | Phase 1: Network | ✅ Complete | High | 3-4.5 hours (actual) | Medium |
-| Phase 1.5: HA VM Reliability | 🔜 Next | High | 2-3 hours | Low |
-| Phase 2: Hue Cleanup | Planned | Medium | 1 hour | Low |
-| Phase 3: Bridge Consolidation | Planned | High | 2-3 hours | Medium |
-| Phase 4: Naming | Planned | Low | 3-4 hours | High |
-| Phase 5: Cameras | ✅ Complete* | Low | - | - |
+| Phase 2: HA VM Reliability | ✅ Complete | High | 2-3 hours (actual) | Low |
+| Phase 2.5: Governance | ✅ Complete | High | Standards only | None |
+| Phase 3: Scrypted/Cameras | ✅ Complete | High | Validated | Low |
+| Phase 2 (Roadmap): Hue Cleanup | Planned | Medium | 1 hour | Low |
+| Phase 3 (Future): Bridge Consolidation | Planned | High | 2-3 hours | Medium |
+| Phase 4: Homebridge | Planned | Medium | 2-3 hours | Low |
+| Phase 4+: HA Naming/Dashboards | Planned | Low | 3-4 hours | High |
 | Phase 6: Automations | Planned | High | 4-6 hours | Low |
 | Phase 7: Aqara | Planned | Low | 1 hour | Low |
-| Phase 8: Dashboard | Planned | Medium | 3-4 hours | None |
 | Phase 9: Monitoring | Ongoing | Medium | 2-3 hours | Low |
-
-*Phase 5 (Cameras) completed as part of Phase 1 stabilization (HKSV validated)
 
 ### Recommended Execution Order
 1. **Phase 0** ✅ (Foundation)
 2. **Phase 1** ✅ (Network security)
-3. **Phase 1.5** (HA VM reliability) ← **Next**
-4. **Phase 2-3** (HomeKit cleanup)
-5. **Phase 6** (Automations)
-6. **Phase 8** (Dashboard)
-7. **Phase 4** (Optional: Naming - only if needed)
-8. **Phase 7** (Optional: Aqara strategy)
-9. **Phase 9** (Ongoing maintenance)
+3. **Phase 2** ✅ (HA VM reliability)
+4. **Phase 2.5** ✅ (Governance standards - defined only)
+5. **Phase 3** ✅ (Scrypted & cameras)
+6. **Phase 2 (Roadmap)** (HomeKit Bridge cleanup) ← **Next suggested**
+7. **Phase 4** (Homebridge setup)
+8. **Phase 4+** (Apply HA naming/labels/dashboards from Phase 2.5)
+9. **Phase 6** (Automations)
+10. **Phase 7** (Optional: Aqara strategy)
+11. **Phase 9** (Ongoing maintenance)
 
 ---
 
@@ -385,14 +467,33 @@ Implement ongoing monitoring and security best practices.
 - Endpoint firewalls enabled (macOS, HA MFA)
 - 72-hour uptime validation passed (zero service interruptions)
 
-### Phase 1.5 (HA VM Reliability)
+### Phase 2 (HA VM Reliability) ✅
 - VM resource allocation documented and optimized
-- HA VM stable (72-hour uptime test passed)
+- HA VM stable (network reliability tests passed)
 - HomeKit response time <2 seconds (no mDNS issues)
 - All integrations showing "Connected" (Hue, Aqara, Kasa, Govee)
 - Backup strategy implemented (automatic weekly + UTM snapshots)
 - Performance baseline documented for future comparison
 - ha-baseline.md updated with actual configuration
+- Host reboot test: PASS
+- Router #1 reboot resiliency: PASS
+- Router #2 reboot resiliency: PASS
+
+### Phase 2.5 (Governance & Normalization) ✅
+- Naming conventions defined
+- Areas vs Zones model established
+- Labels / tags taxonomy documented
+- HomeKit exposure policy defined
+- Dashboard philosophy established
+- **Note:** Standards defined only; application deferred to future phase
+
+### Phase 3 (Scrypted & Cameras) ✅
+- Scrypted consolidated (Desktop App only, Ciao mDNS)
+- All 4 cameras streaming reliably via RTSP
+- HKSV 10-day recording active
+- Camera network isolation validated (internet blocked)
+- Camera recovery after Router #2 reboot: PASS
+- HomeKit camera response time <3 seconds
 
 ### Overall Project
 - HomeKit shows only stable, user-friendly devices (20 devices)

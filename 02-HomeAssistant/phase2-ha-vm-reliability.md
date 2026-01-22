@@ -487,7 +487,7 @@ ping -c 4 192.168.2.150
 ## Next Steps After Phase 2
 
 Once Phase 2 is complete:
-1. **Phase 2 (Roadmap):** HomeKit Bridge Cleanup (remove Hue devices from HA Bridge, use native Hue HomeKit)
+1. **Phase 2.5:** Home Model Governance & Normalization (see phase2.5-governance-normalization.md)
 2. **Phase 3:** Consolidate HomeKit Bridges (merge multiple bridges into single filtered bridge)
 3. **Phase 6:** Automation Library (document and standardize automations)
 
