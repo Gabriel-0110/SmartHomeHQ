@@ -4,6 +4,8 @@
 
 This folder contains network infrastructure documentation for the SmartHomeHQ dual-router architecture.
 
+**Phase 1 Status:** ✅ **COMPLETED** (2026-01-22) — Network segmentation operational and validated.
+
 ## Architecture Summary
 
 - **Dual-router design**: Router #1 (Trusted) + Router #2 (IoT) in intentional double NAT
@@ -14,15 +16,18 @@ This folder contains network infrastructure documentation for the SmartHomeHQ du
 
 ## Contents
 
-### Reference of Truth (Finalized)
-- **PHASE1-START-HERE.md**: Entry point for Phase 1 implementation
-- **phase1a-implementation-guide.md**: Network foundation and device migration
-- **phase1b-implementation-guide.md**: Endpoint and platform hardening
+### Phase 1 Completion (Read First)
+- **[PHASE1-COMPLETION-SUMMARY.md](PHASE1-COMPLETION-SUMMARY.md)**: **READ THIS** — Complete architecture, lessons learned, exit criteria
+- **[current-network.md](current-network.md)**: Final operational network topology (validated 2026-01-22)
+
+### Implementation Guides (Historical Reference)
+- **[PHASE1-START-HERE.md](PHASE1-START-HERE.md)**: Entry point for Phase 1 implementation (completed)
+- **[phase1a-implementation-guide.md](phase1a-implementation-guide.md)**: Network foundation and device migration (completed)
+- **[phase1b-implementation-guide.md](phase1b-implementation-guide.md)**: Endpoint and platform hardening (completed)
 
 ### Supporting Documentation
-- **current-network.md**: Current network state and target topology
-- **phase1-decision-guide.md**: Architecture decisions and rationale
-- **phase1-preflight-checklist.md**: Pre-implementation checklist
+- **[phase1-decision-guide.md](phase1-decision-guide.md)**: Architecture decisions and rationale
+- **[phase1-preflight-checklist.md](phase1-preflight-checklist.md)**: Pre-implementation checklist
 - **network-template.md**: Template for documenting network segments
 
 ### Router Configuration

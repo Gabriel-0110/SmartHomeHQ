@@ -23,22 +23,46 @@ This roadmap outlines the phased migration and improvement plan for the SmartHom
 
 ---
 
-## 🚧 Phase 1: Network Segmentation (NEXT)
+## ✅ Phase 1: Network Segmentation (COMPLETED)
 
 ### Goal
 Implement network segmentation with 3 logical zones: Trusted, IoT, and Cameras.
 
+**Status:** ✅ **COMPLETED** (2026-01-22)
+
 ### Pre-Requisites
-- [ ] Confirm Verizon router model and capabilities
-- [ ] Verify VLAN support or SSID split options
-- [ ] Document current network configuration
+- [x] Confirm Verizon router model and capabilities (CR1000A: no VLANs, no per-SSID firewall)
+- [x] Verify VLAN support or SSID split options (not supported → dual-router topology chosen)
+- [x] Document current network configuration (current-network.md)
 
 ### Tasks
-- [ ] Create [target-segmentation.md](01-Network/target-segmentation.md)
-- [ ] Define firewall rule matrix (Trusted can initiate to all; IoT/Cameras cannot initiate to Trusted)
-- [ ] Plan mDNS/Bonjour preservation strategy for HomeKit discovery
-- [ ] Create step-by-step cutover plan with validation tests
-- [ ] Document rollback procedures
+- [x] Create network segmentation architecture (dual-router design with intentional double NAT)
+- [x] Define firewall rule matrix (endpoint firewalls + Router #2 Access Control)
+- [x] Plan mDNS/Bonjour preservation strategy (all HomeKit bridges on Router #1 subnet)
+- [x] Create step-by-step cutover plan with validation tests (phase1a-implementation-guide.md)
+- [x] Document rollback procedures (phase1-preflight-checklist.md)
+
+### Outputs
+- [PHASE1-COMPLETION-SUMMARY.md](01-Network/PHASE1-COMPLETION-SUMMARY.md) - **Complete architecture & lessons learned**
+- [current-network.md](01-Network/current-network.md) - Final dual-router topology
+- [phase1a-implementation-guide.md](01-Network/phase1a-implementation-guide.md) - Network foundation guide
+- [phase1b-implementation-guide.md](01-Network/phase1b-implementation-guide.md) - Endpoint hardening guide
+- [phase1-decision-guide.md](01-Network/phase1-decision-guide.md) - Architecture decisions
+
+### Key Achievements
+- **Dual-router architecture:** Router #1 (Trusted 192.168.1.x) + Router #2 (IoT 192.168.2.x)
+- **Mac mini dual-homed:** Interface 1 (192.168.1.20) + Interface 2 (192.168.2.10)
+- **Cameras isolated with HKSV:** Internet blocked, local RTSP, 10-day recording active
+- **Scrypted consolidated:** Desktop App only (Ciao mDNS, random ports)
+- **HomeKit stability:** mDNS discovery working, <2 sec response time
+- **UPnP/port forwarding removed:** Router #1 stability restored
+- **72-hour uptime validation:** Zero service interruptions
+
+### Lessons Learned
+1. **Verizon CR1000A instability under UPnP/port forwarding** → Disabled all advanced features
+2. **Scrypted multi-instance conflicts** → Desktop App only, removed Docker/CLI
+3. **HomeKit mDNS sensitivity** → All bridges on same subnet, Ciao mDNS required
+4. **Camera isolation** → Access Control blocking + local RTSP via dual-homed Mac mini
 
 ### Risk Level
 **Medium** - Network changes can disrupt device connectivity
@@ -47,6 +71,8 @@ Implement network segmentation with 3 logical zones: Trusted, IoT, and Cameras.
 - Revert to single network/SSID
 - Restore original router configuration from backup
 - Time: 15-30 minutes
+
+**Rollback Status:** Not needed (Phase 1 stable and operational)
 
 ---
 
@@ -262,25 +288,27 @@ Implement ongoing monitoring and security best practices.
 | Phase | Status | Priority | Estimated Time | Risk Level |
 |-------|--------|----------|----------------|------------|
 | Phase 0: Inventory | ✅ Complete | - | - | - |
-| Phase 1: Network | 🔜 Next | High | 2-4 hours | Medium |
-| Phase 2: Hue Cleanup | Planned | Medium | 1 hour | Low |
+| Phase 1: Network | ✅ Complete | High | 3-4.5 hours (actual) | Medium |
+| Phase 2: Hue Cleanup | 🔜 Next | Medium | 1 hour | Low |
 | Phase 3: Bridge Consolidation | Planned | High | 2-3 hours | Medium |
 | Phase 4: Naming | Planned | Low | 3-4 hours | High |
-| Phase 5: Cameras | Planned | Low | 1 hour | Low |
+| Phase 5: Cameras | ✅ Complete* | Low | - | - |
 | Phase 6: Automations | Planned | High | 4-6 hours | Low |
 | Phase 7: Aqara | Planned | Low | 1 hour | Low |
 | Phase 8: Dashboard | Planned | Medium | 3-4 hours | None |
 | Phase 9: Monitoring | Ongoing | Medium | 2-3 hours | Low |
 
+*Phase 5 (Cameras) completed as part of Phase 1 stabilization (HKSV validated)
+
 ### Recommended Execution Order
 1. **Phase 0** ✅ (Foundation)
-2. **Phase 1** (Network security)
-3. **Phase 2-3** (HomeKit cleanup)
-4. **Phase 5-6** (Cameras + Automations)
+2. **Phase 1** ✅ (Network security)
+3. **Phase 2-3** (HomeKit cleanup) ← **Next**
+4. **Phase 6** (Automations)
 5. **Phase 8** (Dashboard)
 6. **Phase 4** (Optional: Naming - only if needed)
 7. **Phase 7** (Optional: Aqara strategy)
-9. **Phase 9** (Ongoing maintenance)
+8. **Phase 9** (Ongoing maintenance)
 
 ---
 
@@ -290,6 +318,15 @@ Implement ongoing monitoring and security best practices.
 - Complete device inventory
 - Clear ownership strategy
 - HomeKit exposure decisions documented
+
+### Phase 1 ✅
+- Dual-router network architecture operational (Trusted + IoT subnets)
+- Mac mini dual-homed (HA/Scrypted reach IoT devices without routing)
+- Cameras isolated with internet blocked + HKSV active
+- HomeKit mDNS discovery stable (<2 sec response time)
+- UPnP and port forwarding disabled (router stability restored)
+- Endpoint firewalls enabled (macOS, HA MFA)
+- 72-hour uptime validation passed (zero service interruptions)
 
 ### Overall Project
 - HomeKit shows only stable, user-friendly devices (20 devices)
