@@ -76,6 +76,61 @@ Implement network segmentation with 3 logical zones: Trusted, IoT, and Cameras.
 
 ---
 
+## Phase 1.5: Home Assistant VM Reliability & Optimization
+
+### Goal
+Validate and optimize Home Assistant VM (UTM) for reliable, performant operation.
+
+**Status:** 🔜 **NEXT** (After Phase 1 completion)
+
+### Pre-Requisites
+- [x] Phase 1 (Network Segmentation) complete
+- [ ] UTM app access on Mac mini
+- [ ] HA admin credentials (with MFA)
+
+### Tasks
+- [ ] Document current VM configuration (CPU, RAM, disk, network mode)
+- [ ] Establish performance baseline (HomeKit response times, HA UI load times)
+- [ ] Optimize VM resources if needed (CPU cores, RAM allocation)
+- [ ] Validate mDNS/discovery functionality post-Phase 1
+- [ ] Verify all integrations healthy and reachable
+- [ ] Create backup & snapshot strategy (automatic weekly backups)
+- [ ] Run 72-hour stability test
+- [ ] Update ha-baseline.md with discovered configuration
+
+### Inputs
+- [02-HomeAssistant/ha-baseline.md](02-HomeAssistant/ha-baseline.md) - Baseline to update
+- VM CPU/RAM/disk metrics from UTM app
+- VM network mode (bridged/NAT)
+- HA version and install type
+
+### Outputs
+- [phase2-ha-vm-reliability.md](02-HomeAssistant/phase2-ha-vm-reliability.md) - **Full implementation guide**
+- [ha-performance-baseline.md](02-HomeAssistant/ha-performance-baseline.md) - **Performance benchmarks**
+- [phase2-quick-checklist.md](02-HomeAssistant/phase2-quick-checklist.md) - **Quick reference**
+- Updated [ha-baseline.md](02-HomeAssistant/ha-baseline.md) - Filled in TBD values
+
+### Expected Outcome
+- VM resource allocation documented and optimized
+- HA VM stable (72-hour uptime test passed)
+- HomeKit response time <2 seconds (no mDNS issues)
+- All integrations showing "Connected" (Hue, Aqara, Kasa, Govee)
+- Backup strategy implemented (automatic weekly + UTM snapshots)
+- Performance baseline established for future comparison
+
+### Risk Level
+**Low** - Read-only documentation and performance testing, with optional resource optimization
+
+### Rollback Strategy
+- Restore HA backup: "Pre-Phase2-Baseline"
+- Revert UTM VM snapshot: "Pre-Phase2-VM-Snapshot"
+- Revert VM resource changes in UTM app
+- Time: 5-15 minutes
+
+**Estimated Time:** 2-3 hours (excluding 72-hour stability test)
+
+---
+
 ## Phase 2: HomeKit Bridge Cleanup
 
 ### Goal
@@ -289,7 +344,8 @@ Implement ongoing monitoring and security best practices.
 |-------|--------|----------|----------------|------------|
 | Phase 0: Inventory | ✅ Complete | - | - | - |
 | Phase 1: Network | ✅ Complete | High | 3-4.5 hours (actual) | Medium |
-| Phase 2: Hue Cleanup | 🔜 Next | Medium | 1 hour | Low |
+| Phase 1.5: HA VM Reliability | 🔜 Next | High | 2-3 hours | Low |
+| Phase 2: Hue Cleanup | Planned | Medium | 1 hour | Low |
 | Phase 3: Bridge Consolidation | Planned | High | 2-3 hours | Medium |
 | Phase 4: Naming | Planned | Low | 3-4 hours | High |
 | Phase 5: Cameras | ✅ Complete* | Low | - | - |
@@ -303,12 +359,13 @@ Implement ongoing monitoring and security best practices.
 ### Recommended Execution Order
 1. **Phase 0** ✅ (Foundation)
 2. **Phase 1** ✅ (Network security)
-3. **Phase 2-3** (HomeKit cleanup) ← **Next**
-4. **Phase 6** (Automations)
-5. **Phase 8** (Dashboard)
-6. **Phase 4** (Optional: Naming - only if needed)
-7. **Phase 7** (Optional: Aqara strategy)
-8. **Phase 9** (Ongoing maintenance)
+3. **Phase 1.5** (HA VM reliability) ← **Next**
+4. **Phase 2-3** (HomeKit cleanup)
+5. **Phase 6** (Automations)
+6. **Phase 8** (Dashboard)
+7. **Phase 4** (Optional: Naming - only if needed)
+8. **Phase 7** (Optional: Aqara strategy)
+9. **Phase 9** (Ongoing maintenance)
 
 ---
 
@@ -327,6 +384,15 @@ Implement ongoing monitoring and security best practices.
 - UPnP and port forwarding disabled (router stability restored)
 - Endpoint firewalls enabled (macOS, HA MFA)
 - 72-hour uptime validation passed (zero service interruptions)
+
+### Phase 1.5 (HA VM Reliability)
+- VM resource allocation documented and optimized
+- HA VM stable (72-hour uptime test passed)
+- HomeKit response time <2 seconds (no mDNS issues)
+- All integrations showing "Connected" (Hue, Aqara, Kasa, Govee)
+- Backup strategy implemented (automatic weekly + UTM snapshots)
+- Performance baseline documented for future comparison
+- ha-baseline.md updated with actual configuration
 
 ### Overall Project
 - HomeKit shows only stable, user-friendly devices (20 devices)

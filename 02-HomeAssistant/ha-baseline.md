@@ -1,6 +1,6 @@
 # Home Assistant Baseline (Canonical)
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-22
 
 ---
 
@@ -10,13 +10,14 @@
 - **Virtualization:** UTM
 - **HA Install Type:** TBD (HA OS / Supervised / Container - document after verification)
 - **VM Networking:** Bridged (preferred for mDNS/Bonjour discovery)
-- **VM IP Address:** 192.168.1.242 (static/reserved)
+- **VM IP Address:** 192.168.1.21 (static/reserved)
 - **VM Resources:**
   - CPU cores: TBD
   - RAM: TBD
   - Disk: TBD
 - **Timezone:** America/New_York
-- **Access URL:** `http://192.168.1.242:8123`
+- **Access URL:** `http://192.168.1.21:8123`
+  - Note: Some clients may redirect to HTTPS depending on HA configuration
 
 ---
 
@@ -93,8 +94,8 @@
 Based on device inventory, the following integrations are required:
 
 ### Required Integrations
-- **Hue:** REQUIRED (7 Hue lights via Hue Bridge at 192.168.1.169)
-- **Aqara:** REQUIRED (11 Aqara devices via Hub M2 at 192.168.1.165)
+- **Hue:** REQUIRED (7 Hue lights via Hue Bridge at 192.168.2.50)
+- **Aqara:** REQUIRED (11 Aqara devices via Hub M2 at 192.168.2.51)
 - **Tapo:** OPTIONAL (4 Tapo C110 cameras - may be via Scrypted instead)
   - If using Scrypted for cameras, Tapo integration may not be needed in HA
 - **Kasa:** REQUIRED (2 Kasa WiFi plugs)
@@ -181,15 +182,15 @@ Based on device inventory, the following integrations are required:
 ## Integrations / Devices Reachability
 
 ### Network Zones
-**Phase 1 setup:**
-- **HA VM:** On Trusted network (192.168.1.242)
-- **Hue Bridge:** Wired to router (192.168.1.169, reachable from HA)
-- **Aqara Hub M2:** Wired to router (192.168.1.165, reachable from HA)
-- **Kasa plugs:** On IoT SSID (ByteMe, reachable from HA)
-- **Govee devices:** On IoT SSID (ByteMe, reachable from HA)
-- **Tapo cameras:** On Cameras SSID (reachable from HA for integration, if needed)
+**Phase 1/2 setup:**
+- **HA VM:** On Trusted network (Router #1 subnet) at 192.168.1.21
+- **Hue Bridge:** On Router #2 subnet at 192.168.2.50 (IoT devices behind Router #2)
+- **Aqara Hub M2:** On Router #2 subnet at 192.168.2.51 (IoT devices behind Router #2)
+- **Kasa plugs:** On IoT SSID (ByteMe, Router #2 subnet)
+- **Govee devices:** On IoT SSID (ByteMe, Router #2 subnet)
+- **Tapo cameras:** On Cameras SSID (Router #2 subnet)
 
-**HA can reach all networks:** Single subnet (192.168.1.0/24) means HA can communicate with devices on any SSID.
+**HA can reach all networks:** Mac mini dual-homed (192.168.1.20 on Router #1, 192.168.2.10 on Router #2). HomeKit discovery works on Router #1 subnet; IoT devices managed via Router #2 subnet.
 
 ### Discovery Dependencies
 - **mDNS/Bonjour:** Required for HomeKit Bridge discovery by iOS devices
@@ -212,6 +213,11 @@ Based on device inventory, the following integrations are required:
 - **Single subnet:** mDNS works across all SSIDs (no discovery issues expected)
 - **HA on Trusted:** Can reach IoT and Cameras SSIDs for control
 - **Static IPs:** Critical devices (Hue, Aqara, cameras) won't change IPs
+
+### Phase 2 Validation (Completed 2026-01-22)
+- ✅ **Reliability validations:** Host reboot, Router #1 reboot, Router #2 reboot — all PASS
+- ✅ **IP reservation stability:** 192.168.1.21 persisted across all reboot scenarios
+- ✅ **Recovery validation:** HA, HomeKit cameras, and integrations recovered successfully
 
 ---
 
@@ -264,4 +270,4 @@ Based on device inventory, the following integrations are required:
 
 ---
 
-**Last Updated:** 2026-01-19
+**Last Updated:** 2026-01-22
